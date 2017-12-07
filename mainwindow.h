@@ -38,6 +38,8 @@ private slots:
 
     void setProportionratio();
 
+    void CreateGrid();
+
     void on_proportionRatioUF_valueChanged(double arg1);
     void setPopulationSize(double value);
 
@@ -46,6 +48,18 @@ private slots:
     void on_spinBox_3_valueChanged(int arg1);
 
     void on_pushButton_5_clicked();
+
+    void on_doubleSpinBox_7_valueChanged(double arg1);
+
+    void on_doubleSpinBox_3_valueChanged(double arg1);
+
+    void on_doubleSpinBox_5_valueChanged(double arg1);
+
+    void on_spinBox_4_valueChanged(int arg1);
+
+    void on_pushButton_6_clicked();
+
+    void on_pushButton_7_clicked();
 
  private:
     Ui::MainWindow *ui;

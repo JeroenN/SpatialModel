@@ -15,6 +15,9 @@ public:
     explicit Explanation(QWidget *parent = 0);
     ~Explanation();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::Explanation *ui;
 };

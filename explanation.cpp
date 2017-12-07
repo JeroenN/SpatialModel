@@ -12,3 +12,8 @@ Explanation::~Explanation()
 {
     delete ui;
 }
+
+void Explanation::on_pushButton_clicked()
+{
+    close();
+}
