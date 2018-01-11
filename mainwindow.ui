@@ -54,17 +54,19 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget">
-         <property name="minimumSize">
-          <size>
-           <width>300</width>
-           <height>300</height>
-          </size>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="gridLayout"/>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>800</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
           <string>Show graph</string>
          </property>
@@ -238,6 +240,12 @@
       </item>
       <item row="4" column="3">
        <widget class="QDoubleSpinBox" name="proportionRatioUF">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="decimals">
          <number>5</number>
         </property>
@@ -350,6 +358,12 @@
       </item>
       <item row="6" column="1">
        <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QSpinBox" name="debug"/>
+      </item>
+      <item row="1" column="3">
+       <widget class="QSpinBox" name="debug_2"/>
       </item>
      </layout>
     </item>

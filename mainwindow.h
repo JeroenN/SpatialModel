@@ -8,6 +8,9 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include "explanation.h"
+#include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickView>
+#include <QQuickWidget>
 using namespace QtCharts;
 
 
@@ -23,7 +26,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-private slots:
+public slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
@@ -37,8 +40,9 @@ private slots:
     void on_spinBox_2_valueChanged(int arg1);
 
     void setProportionratio();
-
+    void CreateGraph();
     void CreateGrid();
+    void DestroyGraph();
 
     void on_proportionRatioUF_valueChanged(double arg1);
     void setPopulationSize(double value);
@@ -64,6 +68,30 @@ private slots:
  private:
     Ui::MainWindow *ui;
     Explanation *explanation;
+    QChart *chart;
+    QGraphicsScene *scene;
+    QLineSeries *fSeries;
+    QLineSeries *uFSeries;
+    QChartView *chartView;
+
+    QGraphicsScene *gridScene;
+    QQuickWidget *gridWidget;
+
+    float initialPopulationSizeF;
+    float initialPopulationSizeUF;
+    float proportionRatio;
+    float mutationRate;
+    float h2OGroundChange;
+    float nursePlants;
+    int generation;
+    int rngSeed;
+    float temperatureChange;
+    bool gridIsMade;
+    std::vector<float> fXAppends;
+    std::vector<float> fYAppends;
+    std::vector<float> uFXAppends;
+    std::vector<float> uFYAppends;
+
 };
 
 #endif // MAINWINDOW_H
