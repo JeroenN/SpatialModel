@@ -87,11 +87,7 @@ public slots:
 
     void on_pushButton_clicked();
 
-    //void on_pushButton_pressed();
 
-  //  void on_pushButton_released();
-
-    void on_spinBox_3_editingFinished();
 
  private:
     Ui::MainWindow *ui;
@@ -172,11 +168,17 @@ public slots:
                                         plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant, coordinate c, int &n_facilitated_plant
                                         , int &n_unfacilitated_plant);
     void set_plants(yx_grid& g);
-    void set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinates nurse_plant, plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant);
+    void set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinates &nurse_plant, plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant);
     bool distance_between_facilitated_plants(const plant_coordinates facilitated_plant);
     bool distance_between_unfacilitated_plants(const plant_coordinates unfacilitated_plant);
+    void GenerateGeneration(yx_grid& g, plant_coordinates &nurse_plant);
+    void save_generation(plant_coordinates &nurse_plant);
+    void set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinates nurse_plant, int i);
+    void check_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinates &nurse_plant, int i, plant_coordinates seed_coordinate, yx_grid& g);
+    void new_generation(plant_coordinates seed_coordinate, plant_coordinates &nurse_plant, yx_grid& g);
     void nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g);
-    void GenerateGeneration(yx_grid& g, plant_coordinates nurse_plant);
+
+
 
 
 

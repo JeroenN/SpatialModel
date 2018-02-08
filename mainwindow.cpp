@@ -53,7 +53,6 @@ int positive_maker(int number)
 void MainWindow::delay()
 {
     QTime waitTime = QTime::currentTime().addMSecs(1);
-    qDebug() << "Wait";
 
     while(QTime::currentTime() < waitTime)
      {
@@ -105,6 +104,7 @@ void MainWindow::paintEvent(QPaintEvent *)
     qDebug() << "YEnd: " << gridYEnd;
 }*/
 //draws grid on GUI
+//unused
 void MainWindow::DrawGrid2()
 {
     for(int x = gridXStart; x < gridXEnd; x++)
@@ -312,7 +312,7 @@ void MainWindow::position_in_relation_to_plants(yx_grid& g, plant_coordinates nu
          }
     }
 }
-void MainWindow::set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinates nurse_plant, plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant)
+void MainWindow::set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinates &nurse_plant, plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant)
 {
     int position_difference_x;
     int position_difference_y;
@@ -335,11 +335,58 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coor
     }
 
 }
-void MainWindow::nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g)
+void MainWindow::save_generation(plant_coordinates &nurse_plant)
 {
     for(int i=0; i<generation; ++i)
     {
-    generation_coordinates.push_back(nurse_plant);
+        generation_coordinates.push_back(nurse_plant);
+    }
+}
+void MainWindow::set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinates nurse_plant, int i)
+{
+    nurse_plant_y = nurse_plant[i].second;
+    nurse_plant_y+=y;
+    nurse_plant_x = nurse_plant[i].first;
+    nurse_plant_x+=x;
+
+}
+void MainWindow::check_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinates &nurse_plant, int i, plant_coordinates seed_coordinate, yx_grid& g)
+{
+    std::cout<< "nurse plant first: "<<nurse_plant[i].first<<"\n";
+    while(nurse_plant_x < 0 || nurse_plant_x > (g[0].size() - 1))
+    {
+        x = (rand() % 7) - 3;
+        nurse_plant_x = nurse_plant[i].first;
+        nurse_plant_x+=x;
+    }
+    while(nurse_plant_y < 0 || nurse_plant_y > (g.size() - 1))
+    {
+        y = (rand() % 7) - 3;
+        nurse_plant_y = nurse_plant[i].second;
+        nurse_plant_y+=y;
+    }
+/*
+    assert(nurse_plant_y>0);
+    assert(nurse_plant_y<g.size());
+
+    assert(nurse_plant_x>0);
+    assert(nurse_plant_x<g[0].size());
+    */
+}
+void MainWindow::new_generation(plant_coordinates seed_coordinate, plant_coordinates &nurse_plant, yx_grid& g)
+{
+    for(unsigned i=0; i<seed_coordinate.size(); ++i)
+    {
+        nurse_plant.push_back(seed_coordinate[i]);
+        g[nurse_plant[i].second][nurse_plant[i].first]=red;
+    }
+}
+
+void MainWindow::nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g)
+{
+    save_generation(nurse_plant);
+    for(int i=0; i<generation; ++i)
+    {
     plant_coordinates seed_coordinate;
     coordinate c=coordinate(0,0);
     for(unsigned i=0; i<nurse_plant.size(); ++i)
@@ -348,34 +395,17 @@ void MainWindow::nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g)
         int y = (rand() % 7) - 3;
         int nurse_plant_x=0;
         int nurse_plant_y=0;
-
-        nurse_plant_y = nurse_plant[i].second;
-        nurse_plant_y+=y;
-        while(nurse_plant_y < 0 || nurse_plant_y > g.size())
-        {
-            y = (rand() % 7) - 3;
-            nurse_plant_y = nurse_plant[i].second;
-            nurse_plant_y+=y;
-        }
-        nurse_plant_x = nurse_plant[i].first;
-        nurse_plant_x+=x;
-        while(nurse_plant_x< 0 || nurse_plant_x > g[0].size())
-        {
-            x = (rand() % 7) - 3;
-            nurse_plant_x = nurse_plant[i].first;
-            nurse_plant_x+=x;
-        }
+        set_seed_nurse_plant_coordinates(x,y,nurse_plant_x,nurse_plant_y,nurse_plant, i);
+        check_seed_nurse_plant_coordinates(x,y, nurse_plant_x, nurse_plant_y, nurse_plant, i, seed_coordinate, g);
         c=coordinate(nurse_plant_x,nurse_plant_y);
         seed_coordinate.push_back(c);
     }
     nurse_plant.clear();
-    for(unsigned i=0; i<seed_coordinate.size(); ++i)
-    {
-        nurse_plant.push_back(seed_coordinate[i]);
-        g[nurse_plant[i].second][nurse_plant[i].first]=red;
-    }
+    new_generation(seed_coordinate, nurse_plant, g);
+
     }
 }
+
 
 
 void MainWindow::DrawGrid(const yx_grid& g)
@@ -485,7 +515,7 @@ void MainWindow::CreateGraph()
      scene->addItem(chart);
 
 }
-void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinates nurse_plant)
+void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinates &nurse_plant)
 {
 
      nurse_plants_seeds(nurse_plant, g);
@@ -633,14 +663,3 @@ void MainWindow::on_pushButton_clicked()
     delay();
 }
 
-//generation
-void MainWindow::on_spinBox_3_editingFinished()
-{
-    //std::cout<<generationCheck;
-
-    //if(generationCheck == false)
-    //{
-        //generationCheck = true;
-        //delay();
-    //}
-}

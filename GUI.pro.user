@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<<<<<<< HEAD
-<!-- Written by QtCreator 4.4.0, 2018-02-03T10:24:53. -->
-=======
-<!-- Written by QtCreator 4.3.1, 2017-12-13T16:54:17. -->
->>>>>>> 8f2091fe0da0967f1b1bdba237bce3fd84f7695a
+<!-- Written by QtCreator 4.4.0, 2018-02-08T17:26:33. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{5dac1390-e2b2-44f4-ab56-fbf9aa835be1}</value>
+  <value type="QByteArray">{f24e7870-bb8b-4288-9e11-f53a914db6ee}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -63,21 +59,14 @@
  <data>
   <variable>ProjectExplorer.Project.Target.0</variable>
   <valuemap type="QVariantMap">
-<<<<<<< HEAD
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 5.9.1 GCC 64bit</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 5.9.1 GCC 64bit</value>
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.591.gcc_64_kit</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">2</value>
-=======
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Qt 5.9.1 in PATH (qt5)</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Qt 5.9.1 in PATH (qt5)</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{2f246d30-b483-445a-9828-2cdc4b58c2fe}</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
->>>>>>> 8f2091fe0da0967f1b1bdba237bce3fd84f7695a
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/richel/GitHubs/build-GUI-Qt_5_9_1_in_PATH_qt5-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/florian/C++/Projects/build-GUI-Desktop_Qt_5_9_1_GCC_64bit-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -137,7 +126,7 @@
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/richel/GitHubs/build-GUI-Qt_5_9_1_in_PATH_qt5-Release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/florian/C++/Projects/build-GUI-Desktop_Qt_5_9_1_GCC_64bit-Release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -197,7 +186,7 @@
     <value type="bool" key="Qt4ProjectManager.Qt4BuildConfiguration.UseShadowBuild">true</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/richel/GitHubs/build-GUI-Qt_5_9_1_in_PATH_qt5-Profile</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/florian/C++/Projects/build-GUI-Desktop_Qt_5_9_1_GCC_64bit-Profile</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -314,18 +303,14 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">GUI</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/richel/GitHubs/Spatial-model/GUI.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">GUI2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/florian/C++/Projects/SpatialModel/GUI.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">GUI.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
-<<<<<<< HEAD
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default">/home/florian/C++/Projects/build-GUI-Desktop_Qt_5_9_1_GCC_64bit-Profile</value>
-=======
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default">/home/richel/GitHubs/build-GUI-Qt_5_9_1_in_PATH_qt5-Debug</value>
->>>>>>> 8f2091fe0da0967f1b1bdba237bce3fd84f7695a
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
