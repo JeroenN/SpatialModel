@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>720</height>
+    <height>967</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>800</width>
            <height>0</height>
           </size>
          </property>
@@ -48,19 +48,6 @@
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_7">
-         <property name="text">
-          <string>Close Grid</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="gridLayout"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
          <property name="minimumSize">
           <size>
            <width>800</width>
@@ -68,26 +55,58 @@
           </size>
          </property>
          <property name="text">
-          <string>Show graph</string>
+          <string>Enlarge Graph</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>Close graph</string>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="gridLayout">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>800</width>
+             <height>400</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>800</width>
+             <height>400</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
     </item>
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="9" column="0">
+      <item row="8" column="0">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -103,7 +122,7 @@
         </property>
        </spacer>
       </item>
-      <item row="13" column="0">
+      <item row="11" column="0">
        <widget class="QPushButton" name="pushButton_5">
         <property name="text">
          <string>Explanation</string>
@@ -113,7 +132,7 @@
       <item row="1" column="1">
        <widget class="QSpinBox" name="spinBox_2">
         <property name="maximum">
-         <number>1000</number>
+         <number>3600</number>
         </property>
         <property name="value">
          <number>1</number>
@@ -172,7 +191,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
+      <item row="2" column="2">
        <widget class="QSlider" name="horizontalSlider">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -200,27 +219,12 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
-      </item>
       <item row="3" column="1">
        <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
         <property name="font">
          <font>
           <pointsize>9</pointsize>
          </font>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_14">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>proportion ratio (F : UF):</string>
         </property>
        </widget>
       </item>
@@ -231,66 +235,40 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="0">
-       <widget class="QPushButton" name="pushButton_4">
-        <property name="text">
-         <string>Reset</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="3">
-       <widget class="QDoubleSpinBox" name="proportionRatioUF">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="decimals">
-         <number>5</number>
-        </property>
-        <property name="maximum">
-         <double>1000000.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="12" column="0">
+      <item row="10" column="0">
        <widget class="QPushButton" name="pushButton_3">
         <property name="text">
          <string>Run</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="2">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>:</string>
+      <item row="7" column="1">
+       <widget class="QSpinBox" name="spinBox_4">
+        <property name="maximum">
+         <number>100000</number>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_4">
-        <property name="layoutDirection">
-         <enum>Qt::RightToLeft</enum>
-        </property>
-        <property name="text">
-         <string>         1</string>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="spinBox_3">
+        <property name="maximum">
+         <number>100</number>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="label_12">
         <property name="font">
          <font>
-          <pointsize>9</pointsize>
+          <pointsize>12</pointsize>
          </font>
         </property>
         <property name="text">
-         <string>fixed proportion of nurse plants:</string>
+         <string>Nurse Plants</string>
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="label_11">
         <property name="font">
          <font>
@@ -302,14 +280,7 @@
         </property>
        </widget>
       </item>
-      <item row="8" column="1">
-       <widget class="QSpinBox" name="spinBox_4">
-        <property name="maximum">
-         <number>100000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
+      <item row="6" column="0">
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
@@ -321,26 +292,10 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>H2O in ground change:</string>
-        </property>
-       </widget>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
       </item>
-      <item row="7" column="1">
-       <widget class="QSpinBox" name="spinBox_3">
-        <property name="maximum">
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="3">
+      <item row="6" column="2">
        <widget class="QSlider" name="horizontalSlider_2">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -356,14 +311,31 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>H2O in ground change:</string>
+        </property>
+       </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QSpinBox" name="debug"/>
+      <item row="4" column="1">
+       <widget class="QSpinBox" name="spinBox_5">
+        <property name="maximum">
+         <number>200</number>
+        </property>
+       </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QSpinBox" name="debug_2"/>
+      <item row="9" column="0">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
