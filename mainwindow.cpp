@@ -49,6 +49,12 @@ MainWindow::MainWindow(QWidget *parent) :
       mFitnessChart->setAxisY(axisY);
       mFitnessSeriesFacilitated->setName("Facilitated");
       mFitnessSeriesUnfacilitated->setName("Unfacilitated");
+
+
+      mActualValueLine = new QFrame(mFitnessChartView);
+      mActualValueLine->setObjectName(QString::fromUtf8("line"));
+      mActualValueLine->setFrameShape(QFrame::VLine);
+      mActualValueLine->setFrameShadow(QFrame::Sunken);
     }
     //Setup all fitness chart-related things
     {
@@ -62,8 +68,8 @@ MainWindow::MainWindow(QWidget *parent) :
       *mNumberOfSeedsFacilitatedSet << 10;
       *mNumberOfSeedsUnfacilitatedSet << 100;
       QBarSeries *series = new QBarSeries();
-      series->append(mNumberOfSeedsFacilitatedSet);
       series->append(mNumberOfSeedsUnfacilitatedSet);
+      series->append(mNumberOfSeedsFacilitatedSet);
       mNumberOfSeedsChart->addSeries(series);
 
       //mNumberOfSeedsChart->addSeries(mFitnessSeriesUnfacilitated);
@@ -99,13 +105,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
     CreateGrid();
 
-    QObject::connect(ui->box_fit_fac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
-    QObject::connect(ui->box_fit_fac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
-    QObject::connect(ui->box_fit_unfac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
-    QObject::connect(ui->box_fit_unfac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
+    QObject::connect(ui->box_fit_fac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
+    QObject::connect(ui->box_fit_fac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
+    QObject::connect(ui->box_fit_unfac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
+    QObject::connect(ui->box_fit_unfac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
+    QObject::connect(ui->box_trait_optimum, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
 
-    ShowFitnessGraph();
-    //ShowStart();
+    ShowGraphs();
 }
 
 MainWindow::~MainWindow()
@@ -650,7 +656,38 @@ void MainWindow::ShowFitnessGraph()
   }
   mFitnessChart->show();
 
+  //Put the actual value line
+  mActualValueLine->setGeometry(
+    QRect(
+      ui->box_trait_optimum->value() * 1000.0, //Dirty hack, should be improved
+      80,
+      3,
+      300
+     )
+  );
 }
+
+void MainWindow::ShowNumberOfSeedsGraph()
+{
+  //Dirty hack: just assume there are plants of all traits, from 0-1, both
+  //facilitated and unfacilitated
+  const double fitness_facilitated = normal(
+    ui->box_trait_optimum->value(),
+    ui->box_fit_fac_opt->value(),
+    ui->box_fit_fac_sd->value()
+  );
+  const double fitness_unfacilitated = normal(
+    ui->box_trait_optimum->value(),
+    ui->box_fit_unfac_opt->value(),
+    ui->box_fit_unfac_sd->value()
+  );
+  mNumberOfSeedsFacilitatedSet->remove(0);
+  mNumberOfSeedsFacilitatedSet->append(100.0 * fitness_facilitated);
+  mNumberOfSeedsUnfacilitatedSet->remove(0);
+  mNumberOfSeedsUnfacilitatedSet->append(100.0 * fitness_unfacilitated);
+  mNumberOfSeedsChart->show();
+}
+
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
 {
      nurse_plants_seeds(nurse_plant, g);
@@ -800,7 +837,7 @@ void MainWindow::on_pushButton_clicked()
     ui->spinBox_init_n_uf->setValue(0);
     ui->spinBox_generation->setValue(0);
     ui->spinBox_n_nurse->setValue(0);
-    ui->doubleSpinBox_7->setValue(0);
+    ui->box_trait_optimum->setValue(0);
     delay();
 }
 
@@ -809,10 +846,10 @@ void MainWindow::on_pushButton_clicked()
 /// as there appeared to be no order in the place of functions
 ///-----------------------------------------------------------------------------
 
-void MainWindow::ShowStart()
+void MainWindow::ShowGraphs()
 {
-    CreateGrid();
     ShowFitnessGraph();
+    ShowNumberOfSeedsGraph();
 }
 
 /*

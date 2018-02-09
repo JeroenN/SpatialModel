@@ -52,13 +52,11 @@ public slots:
     //RJCB: Does not do anything useful
     //void on_spinBox_n_uf_valueChanged(int arg1);
 
+    void ShowGraphs();
     void ShowFitnessGraph();
+    void ShowNumberOfSeedsGraph();
     void CreateGrid();
     void RemoveGrid();
-
-    ///Show how the current parameters have an effect on
-    ///the starting grid and graphs
-    void ShowStart();
 
     //void SetGridResolution();
     void delay();
@@ -109,6 +107,9 @@ public slots:
     QLineSeries *mFitnessSeriesFacilitated;
     QLineSeries *mFitnessSeriesUnfacilitated  ;
     QChartView *mFitnessChartView;
+
+    ///The line that shows which is the actual abiotic value
+    QFrame * mActualValueLine;
 
     ///Bar chart to display the number of seeds
     ///produced by both facilitated and
