@@ -29,9 +29,15 @@ MainWindow::MainWindow(QWidget *parent) :
     //ui->pushButton_2->setHidden(true);
     ui->pushButton_6->setHidden(true);
     //ui->pushButton_7->setHidden(true);
-    m_image.load("/home/florian/C++/Projects/SpatialModel/Grid.png");
+
+    //RJCB: Load from resources file, spatial-model.qrc
+    m_image.load(":/pics/Grid.png");
+
     ui->label_5->setPixmap(QPixmap::fromImage(m_image));
     ui->label_10->setHidden(true);
+
+    QObject::connect(ui->spinBox_n_f, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+
     CreateGrid();
     CreateGraph();
 
@@ -42,14 +48,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-int positive_maker(int number)
-{
-    if(number<0)
-    {
-        number*=-1;
-    }
-    return number;
-}
+
 void MainWindow::delay()
 {
     QTime waitTime = QTime::currentTime().addMSecs(1);
@@ -98,10 +97,10 @@ void MainWindow::paintEvent(QPaintEvent *)
     gridYStart = screenGeometry.height() / 75;
     gridXEnd = screenGeometry.width() / 14;
     gridYEnd = screenGeometry.height() / 12;
-    qDebug() << "XStart: " << gridXStart;
-    qDebug() << "XEnd: " << gridXEnd;
-    qDebug() << "YStart: " << gridYStart;
-    qDebug() << "YEnd: " << gridYEnd;
+    qCritical() << "XStart: " << gridXStart;
+    qCritical() << "XEnd: " << gridXEnd;
+    qCritical() << "YStart: " << gridYStart;
+    qCritical() << "YEnd: " << gridYEnd;
 }*/
 //draws grid on GUI
 //unused
@@ -116,103 +115,134 @@ void MainWindow::DrawGrid2()
     }
 }
 
-void MainWindow::distance_between_nurse_plants(plant_coordinates &nurse_plant, int &add_nurse_plant_i, yx_grid& g)
+#ifdef RJCB_REFACTORED
+Moved to add_nurse_plants
+
+/// nurse_plant_coordinats.back() has a candidate seed
+void MainWindow::distance_between_nurse_plants(
+  plant_coordinats &nurse_plant_coordinats,
+  int &add_nurse_plant_i,
+  yx_grid& g
+)
 {
-    int position_difference_x;
-    int position_difference_y;
-    int n_nurse_plant=nurse_plant.size();
     bool distance_enough=true;
+    /* Moved to is_good_spot_for_nurse_plant
 
-    for(int i=0; i<n_nurse_plant; ++i)
+    int n_nurse_plant_coordinats=nurse_plant_coordinats.size();
+    for(int i=0; i<n_nurse_plant_coordinats; ++i)
     {
-        if(i!=n_nurse_plant-1)  //This makes sure the nurse plant doesn't check the distance between its self
+        if(i!=n_nurse_plant_coordinats-1)  //This makes sure the nurse plant doesn't check the distance between its self
         {
-            position_difference_x= nurse_plant[i].first - nurse_plant[n_nurse_plant-1].first;
-            position_difference_y= nurse_plant[i].second - nurse_plant[n_nurse_plant-1].second;
-
-            position_difference_x=positive_maker(position_difference_x);
-            position_difference_y=positive_maker(position_difference_y);
-
+            const int position_difference_x=std::abs(nurse_plant_coordinats[i].first - nurse_plant_coordinats[n_nurse_plant_coordinats-1].first);
+            const int position_difference_y=std::abs(nurse_plant_coordinats[i].second - nurse_plant_coordinats[n_nurse_plant_coordinats-1].second);
             if(position_difference_x<=1 && position_difference_y<=1)
             {
                 distance_enough=false;
             }
         }
     }
+    */
     if(distance_enough==true)
     {
-         g[nurse_plant[n_nurse_plant-1].second][nurse_plant[n_nurse_plant-1].first]=blue;
+         g[nurse_plant_coordinats[n_nurse_plant_coordinats-1].second][nurse_plant_coordinats[n_nurse_plant_coordinats-1].first]=blue;
     }
     else
     {
         add_nurse_plant_i+=1;
-        nurse_plant.pop_back();
+        nurse_plant_coordinats.pop_back();
     }
 }
-void MainWindow::set_nurse_plant(yx_grid& g, plant_coordinates &nurse_plant)
+#endif // RJCB_REFACTORED
+
+
+///RJCB: renamed to 'add_nurse_plants' from from 'set_nurse_plant'
+///  as nurse plants are added
+///Adds mNnursePlants to both grid and nurse_plant_coordinats
+void MainWindow::add_nurse_plants(
+  yx_grid& g,
+  plant_coordinats &nurse_plant_coordinats
+)
 {
-    int n_nurse_plants= nursePlants;
-    //assert n_nur
-    int x=0;
-    int y=0;
-    coordinate c=coordinate(0,0);
+    const int n_nurse_plants = mNnursePlants;
 
     for(int i=0; i<n_nurse_plants; ++i)
     {
-        x=rand() % g[0].size();
-        y=rand() % g.size();
-        c = coordinate(x, y);
-        nurse_plant.push_back(c);
-        distance_between_nurse_plants(nurse_plant, n_nurse_plants, g);
+        //Pick a random spot to potentially put a nurse plant
+        const int x=rand() % g[0].size(); //RJCB: Made more local and const
+        const int y=rand() % g.size(); //RJCB: Made more local and const
+        const coordinat c(x, y); //RJCB: Made more local and const
+        if (is_good_spot_for_nurse_plant(c, nurse_plant_coordinats))
+        {
+          nurse_plant_coordinats.push_back(c);
+          g[c.second][c.first]=blue;
+
+        }
+        //RJCB: Use this approach instead of                            C
+        // - adding a seed to nurse_plant_coordinats                    O
+        // - see if it works                                            M
+        //   - if yes, keep the seed, add it to grid                    P
+        //   - if no, remove the seed from nurse_plant_coordinats       L
+        //                                                              E
+        //                                                              X
+        //
+        //                                                              !
+        //
+        //distance_between_nurse_plants(nurse_plant_coordinats, n_nurse_plants, g);
     }
 }
 
-void MainWindow::position_check_facilitated_plant(int position_difference_x, int position_difference_y, bool &make_facilitated_plant,
-                                      bool &make_unfacilitated_plant, bool &stop_unfaciliated, bool &stop_faciliated)
+void MainWindow::position_check_facilitated_plant(
+  int dx, //RJCB: delta x, a standard name for the difference in horizontal positions
+  int dy,
+  bool &make_facilitated_plant,
+  bool &make_unfacilitated_plant,
+  bool &stop_unfaciliated,
+  bool &stop_faciliated
+)
 {
-    if(position_difference_x>1 && position_difference_y>1 && stop_unfaciliated==false)
+    if(dx>1 && dy>1 && stop_unfaciliated==false)
     {
        make_unfacilitated_plant=true;
     }
-    if(position_difference_x>1 && position_difference_y==0 && stop_unfaciliated==false)
+    if(dx>1 && dy==0 && stop_unfaciliated==false)
     {
        make_unfacilitated_plant=true;
     }
-    if(position_difference_x==0 && position_difference_y>1 && stop_unfaciliated==false)
-    {
-       make_unfacilitated_plant=true;
-    }
-
-    if(position_difference_x==1 && position_difference_y>1 && stop_unfaciliated==false)
-    {
-       make_unfacilitated_plant=true;
-    }
-    if(position_difference_x>1 && position_difference_y==1 && stop_unfaciliated==false)
+    if(dx==0 && dy>1 && stop_unfaciliated==false)
     {
        make_unfacilitated_plant=true;
     }
 
+    if(dx==1 && dy>1 && stop_unfaciliated==false)
+    {
+       make_unfacilitated_plant=true;
+    }
+    if(dx>1 && dy==1 && stop_unfaciliated==false)
+    {
+       make_unfacilitated_plant=true;
+    }
 
-    if(position_difference_x ==1 && position_difference_y==1 && stop_faciliated==false)
+
+    if(dx ==1 && dy==1 && stop_faciliated==false)
     {
         make_facilitated_plant=true;
         make_unfacilitated_plant=false;
         stop_unfaciliated=true;
     }
-    if(position_difference_x ==0 && position_difference_y==1 && stop_faciliated==false)
+    if(dx ==0 && dy==1 && stop_faciliated==false)
     {
         make_facilitated_plant=true;
         make_unfacilitated_plant=false;
         stop_unfaciliated=true;
     }
-    if(position_difference_x ==1 && position_difference_y==0 && stop_faciliated==false)
+    if(dx ==1 && dy==0 && stop_faciliated==false)
     {
         make_facilitated_plant=true;
         make_unfacilitated_plant=false;
         stop_unfaciliated=true;
     }
 
-    if(position_difference_x==0 && position_difference_y==0)
+    if(dx==0 && dy==0)
     {
        make_facilitated_plant=false;
        make_unfacilitated_plant=false;
@@ -220,7 +250,7 @@ void MainWindow::position_check_facilitated_plant(int position_difference_x, int
        stop_unfaciliated=true;
     }
 }
-bool MainWindow::distance_between_facilitated_plants(const plant_coordinates facilitated_plant)
+bool MainWindow::distance_between_facilitated_plants(const plant_coordinats facilitated_plant)
 {
     int position_difference_x;
     int position_difference_y;
@@ -233,8 +263,8 @@ bool MainWindow::distance_between_facilitated_plants(const plant_coordinates fac
             position_difference_x= facilitated_plant[i].first - facilitated_plant[n_facilitated_plant-1].first;
             position_difference_y= facilitated_plant[i].second - facilitated_plant[n_facilitated_plant-1].second;
 
-            position_difference_x=positive_maker(position_difference_x);
-            position_difference_y=positive_maker(position_difference_y);
+            position_difference_x=std::abs(position_difference_x);
+            position_difference_y=std::abs(position_difference_y);
 
             if(position_difference_x==0 && position_difference_y==0)
             {
@@ -244,7 +274,7 @@ bool MainWindow::distance_between_facilitated_plants(const plant_coordinates fac
     }
     return true;
 }
-bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinates unfacilitated_plant)
+bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinats unfacilitated_plant)
 {
     int position_difference_x;
     int position_difference_y;
@@ -257,8 +287,8 @@ bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinates u
             position_difference_x= unfacilitated_plant[i].first - unfacilitated_plant[n_unfacilitated_plant-1].first;
             position_difference_y= unfacilitated_plant[i].second - unfacilitated_plant[n_unfacilitated_plant-1].second;
 
-            position_difference_x=positive_maker(position_difference_x);
-            position_difference_y=positive_maker(position_difference_y);
+            position_difference_x=std::abs(position_difference_x);
+            position_difference_y=std::abs(position_difference_y);
 
             if(position_difference_x==0 && position_difference_y==0)
             {
@@ -268,81 +298,121 @@ bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinates u
     }
     return true;
 }
-void MainWindow::position_in_relation_to_plants(yx_grid& g, plant_coordinates nurse_plant, plant_coordinates seeds, int &position_difference_x, int &position_difference_y,
-                                    plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant, coordinate c, int &n_facilitated_plant
-                                    , int &n_unfacilitated_plant)
+
+///RJCB: Please as a friend what he/she expects from a function
+///  with name 'position_in_relation_to_plants'.
+///  No idea what this function did at first!
+/// 'put_seed'?
+/// @param g grid that will have a seed added
+void MainWindow::position_in_relation_to_plants(
+  yx_grid& g,
+  const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats
+  const plant_coordinats& seed_coordinats, //RJCB: Those were not seed, those were seed coordinats
+  plant_coordinats &facilitated_plant,
+  plant_coordinats &unfacilitated_plant,
+  const coordinat& c,
+  int &n_facilitated_plants_to_add,
+  int &n_unfacilitated_plants_to_add
+)
 {
-    int n_plant=seeds.size();
     bool make_facilitated_plant=false;
     bool make_unfacilitated_plant=false;
     bool stop_unfacilitated=false;
     bool stop_facilitated=false;
-    for(unsigned i=0; i<nurse_plant.size(); ++i)
+
+    //RJCB: just iterator over all coordinats
+    //npc: Nurse Plant Coordinat
+    //See if the seed has fallen close to a nurse plant
+    for(const auto& npc: nurse_plant_coordinats)
     {
-            position_difference_x= nurse_plant[i].first - seeds[n_plant-1].first;
-            position_difference_y= nurse_plant[i].second - seeds[n_plant-1].second;
-            position_difference_x=positive_maker(position_difference_x);
-            position_difference_y=positive_maker(position_difference_y);
-            position_check_facilitated_plant(position_difference_x, position_difference_y, make_facilitated_plant, make_unfacilitated_plant, stop_unfacilitated, stop_facilitated);
+        const auto& last_seed_coordinat = seed_coordinats.back();
+        const int dx=std::abs(npc.first - last_seed_coordinat.first);
+        const int dy=std::abs(npc.second - last_seed_coordinat.second);
+        position_check_facilitated_plant(
+            dx,
+            dy,
+            make_facilitated_plant,
+            make_unfacilitated_plant,
+            stop_unfacilitated,
+            stop_facilitated
+        );
     }
-    if(make_facilitated_plant==true && n_facilitated_plant>0)
+    if(make_facilitated_plant==true && n_facilitated_plants_to_add>0)
     {
-         g[seeds[seeds.size()-1].second][seeds[seeds.size()-1].first]=green;
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=green;
          facilitated_plant.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant)==true)
          {
-            n_facilitated_plant-=1;
+            --n_facilitated_plants_to_add;
          }
          else
          {
              facilitated_plant.pop_back();
          }
     }
-    if(make_unfacilitated_plant==true && n_unfacilitated_plant>0)
+    if(make_unfacilitated_plant==true && n_unfacilitated_plants_to_add>0)
     {
-         g[seeds[seeds.size()-1].second][seeds[seeds.size()-1].first]=white;
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=white;
          unfacilitated_plant.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant)==true)
          {
-            n_unfacilitated_plant-=1;
+            --n_unfacilitated_plants_to_add;
          }
          else
          {
-             unfacilitated_plant.pop_back();
+            unfacilitated_plant.pop_back();
          }
     }
 }
-void MainWindow::set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinates &nurse_plant, plant_coordinates &facilitated_plant, plant_coordinates &unfacilitated_plant)
+void MainWindow::set_facilitated_and_unfacilitated_plants(
+  yx_grid& g,
+  plant_coordinats &nurse_plant,
+  plant_coordinats &facilitated_plant,
+  plant_coordinats &unfacilitated_plant
+)
 {
-    int position_difference_x;
-    int position_difference_y;
-    int x=0;
-    int y=0;
-    int n_facilitated_plants= initialPopulationSizeF;
-    int n_unfacilitated_plants= initialPopulationSizeUF;
-    plant_coordinates seeds;
-    coordinate c=coordinate(0,0);
+    int n_facilitated_plants_to_add = initialPopulationSizeF;
+    int n_unfacilitated_plants_to_add = initialPopulationSizeUF;
+    assert(n_facilitated_plants_to_add >= 0);
+    assert(n_unfacilitated_plants_to_add >= 0);
+    plant_coordinats seeds;
 
-    //while(plants.size()!=n_facilitated_plants+n_unfacilitated_plants)
-    while(n_facilitated_plants+n_unfacilitated_plants>0)
+    //Create as much facilitated and unfacilitated plants as needed
+    while(n_facilitated_plants_to_add+n_unfacilitated_plants_to_add>0)
     {
-        x=rand() % g[0].size();
-        y=rand() % g.size();
-        c=coordinate(x,y);
-        seeds.push_back(c);
-        position_in_relation_to_plants(g,nurse_plant, seeds, position_difference_x, position_difference_y, facilitated_plant, unfacilitated_plant, c,
-                                       n_facilitated_plants, n_unfacilitated_plants);
+      //Create a random seed
+      qCritical() << ".";
+      const int x=rand() % g[0].size();
+      const int y=rand() % g.size();
+      const coordinat c(x,y);
+      seeds.push_back(c);
+      //int position_difference_x = 0; //RJCB: Unused here
+      //int position_difference_y = 0; //RJCB: Unused here
+      //Determine what this seed will add up to:
+      //the number of facilitated of unfacilitated plants?
+      position_in_relation_to_plants(
+        g,
+        nurse_plant,
+        seeds,
+        //position_difference_x, //RJCB: Unused here
+        //position_difference_y, //RJCB: Unused here
+        facilitated_plant,
+        unfacilitated_plant,
+        c,
+        n_facilitated_plants_to_add,
+        n_unfacilitated_plants_to_add
+      );
     }
 
 }
-void MainWindow::save_generation(plant_coordinates &nurse_plant)
+void MainWindow::save_generation(plant_coordinats &nurse_plant)
 {
-    for(int i=0; i<generation; ++i)
+    for(int i=0; i<mGeneration; ++i)
     {
         generation_coordinates.push_back(nurse_plant);
     }
 }
-void MainWindow::set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinates nurse_plant, int i)
+void MainWindow::set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinats nurse_plant, int i)
 {
     nurse_plant_y = nurse_plant[i].second;
     nurse_plant_y+=y;
@@ -350,16 +420,25 @@ void MainWindow::set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant
     nurse_plant_x+=x;
 
 }
-void MainWindow::check_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinates &nurse_plant, int i, plant_coordinates seed_coordinate, yx_grid& g)
+void MainWindow::check_seed_nurse_plant_coordinates(
+  int x,
+  int y,
+  int &nurse_plant_x,
+  int &nurse_plant_y,
+  plant_coordinats &nurse_plant,
+  int i,
+  plant_coordinats /* seed_coordinate */, //RJCB: Unused argument, so I just comment it out
+  yx_grid& g
+ )
 {
     std::cout<< "nurse plant first: "<<nurse_plant[i].first<<"\n";
-    while(nurse_plant_x < 0 || nurse_plant_x > (g[0].size() - 1))
+    while(nurse_plant_x < 0 || nurse_plant_x > (static_cast<int>(g[0].size()) - 1)) //RJCB: must static_cast std::size_t to int
     {
         x = (rand() % 7) - 3;
         nurse_plant_x = nurse_plant[i].first;
         nurse_plant_x+=x;
     }
-    while(nurse_plant_y < 0 || nurse_plant_y > (g.size() - 1))
+    while(nurse_plant_y < 0 || nurse_plant_y > (static_cast<int>(g.size()) - 1)) //RJCB: must static_cast std::size_t to int
     {
         y = (rand() % 7) - 3;
         nurse_plant_y = nurse_plant[i].second;
@@ -373,7 +452,7 @@ void MainWindow::check_seed_nurse_plant_coordinates(int x, int y, int &nurse_pla
     assert(nurse_plant_x<g[0].size());
     */
 }
-void MainWindow::new_generation(plant_coordinates seed_coordinate, plant_coordinates &nurse_plant, yx_grid& g)
+void MainWindow::new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g)
 {
     for(unsigned i=0; i<seed_coordinate.size(); ++i)
     {
@@ -382,13 +461,13 @@ void MainWindow::new_generation(plant_coordinates seed_coordinate, plant_coordin
     }
 }
 
-void MainWindow::nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g)
+void MainWindow::nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g)
 {
     save_generation(nurse_plant);
-    for(int i=0; i<generation; ++i)
+    for(int i=0; i<mGeneration; ++i)
     {
-    plant_coordinates seed_coordinate;
-    coordinate c=coordinate(0,0);
+    plant_coordinats seed_coordinate;
+    coordinat c=coordinat(0,0);
     for(unsigned i=0; i<nurse_plant.size(); ++i)
     {
         int x = (rand() % 7) - 3;
@@ -397,7 +476,7 @@ void MainWindow::nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g)
         int nurse_plant_y=0;
         set_seed_nurse_plant_coordinates(x,y,nurse_plant_x,nurse_plant_y,nurse_plant, i);
         check_seed_nurse_plant_coordinates(x,y, nurse_plant_x, nurse_plant_y, nurse_plant, i, seed_coordinate, g);
-        c=coordinate(nurse_plant_x,nurse_plant_y);
+        c=coordinat(nurse_plant_x,nurse_plant_y);
         seed_coordinate.push_back(c);
     }
     nurse_plant.clear();
@@ -410,6 +489,7 @@ void MainWindow::nurse_plants_seeds(plant_coordinates &nurse_plant, yx_grid& g)
 
 void MainWindow::DrawGrid(const yx_grid& g)
 {
+    qCritical() << __FUNCTION__;
     const int n_rows = g.size();
     for(int i=0; i<n_rows; ++i)
     {
@@ -425,19 +505,27 @@ void MainWindow::DrawGrid(const yx_grid& g)
 }
 void MainWindow::set_plants(yx_grid& g)
 {
-    plant_coordinates nurse_plant;
-    plant_coordinates facilitated_plant;
-    plant_coordinates unfacilitated_plant;
-    set_nurse_plant(g, nurse_plant);
+    qCritical() << __FUNCTION__;
+    plant_coordinats nurse_plant;
+    qCritical() << __LINE__;
+    plant_coordinats facilitated_plant;
+    qCritical() << __LINE__;
+    plant_coordinats unfacilitated_plant;
+    qCritical() << __LINE__;
+    add_nurse_plants(g, nurse_plant);
+    qCritical() << __LINE__;
     set_facilitated_and_unfacilitated_plants(g, nurse_plant, facilitated_plant, unfacilitated_plant);
-    if(generation >0)
+    qCritical() << __LINE__;
+    #ifdef NOT_NOW
+    if(m_generation > 0)
     {
         GenerateGeneration(g, nurse_plant);
     }
-
+    #endif // NOT_NOW
 }
 void MainWindow::CreateGrid()
 {
+    qCritical() << __FUNCTION__;
     usingColor = blue;
     //SetGridResolution();
     set_seed();
@@ -515,18 +603,17 @@ void MainWindow::CreateGraph()
      scene->addItem(chart);
 
 }
-void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinates &nurse_plant)
+void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
 {
-
      nurse_plants_seeds(nurse_plant, g);
     //produce new plants
     //remove dead plants
 }
 void MainWindow::setPopulationSize(double value)
 {
-    if(ui->spinBox->value() != 0)
+    if(ui->spinBox_n_f->value() != 0)
     {
-        value = value * ui->spinBox->value();
+        value = value * ui->spinBox_n_f->value();
     }
     ui->spinBox_2->setValue(value);
 }
@@ -544,7 +631,7 @@ void MainWindow::on_spinBoxMutation_valueChanged(double arg1)
     mutationRate = arg1;
 }
 //value changed F spinbox
-void MainWindow::on_spinBox_valueChanged(int arg1)
+void MainWindow::on_spinBox_n_f_valueChanged(int arg1)
 {
     initialPopulationSizeF = arg1;
 }
@@ -567,7 +654,7 @@ void MainWindow::on_horizontalSlider_2_valueChanged(int value)
 void MainWindow::on_spinBox_3_valueChanged(int arg1)
 {
     ui->horizontalSlider_2->setValue(arg1);
-    generation = arg1;
+    mGeneration = arg1;
 
 }
 //show explanation
@@ -584,7 +671,7 @@ void MainWindow::on_doubleSpinBox_7_valueChanged(double arg1)
 //fixed proportion of Nurse Plants
 void MainWindow::on_spinBox_5_valueChanged(int arg1)
 {
-    nursePlants = arg1;
+    mNnursePlants = arg1;
 }
 //H2O ground change
 void MainWindow::on_doubleSpinBox_5_valueChanged(double arg1)
@@ -594,8 +681,8 @@ void MainWindow::on_doubleSpinBox_5_valueChanged(double arg1)
 //RNG
 void MainWindow::on_spinBox_4_valueChanged(int arg1)
 {
-    rngSeed = arg1;
-    generation = 0;
+    mRngSeed = arg1;
+    mGeneration = 0;
     ui->horizontalSlider_2->setValue(0);
     ui->spinBox_3->setValue(0);
     set_seed();
@@ -621,8 +708,9 @@ void MainWindow::on_pushButton_7_clicked()
     ui->label_5->setMinimumHeight(0);
     RemoveGrid();
 }
+
 //run
-void MainWindow::on_pushButton_3_pressed()
+void MainWindow::on_pushButton_run_pressed()
 {
     ui->label_5->setMaximumHeight(0);
     ui->label_5->setMinimumHeight(0);
@@ -632,7 +720,7 @@ void MainWindow::on_pushButton_3_pressed()
 
 }
 //run
-void MainWindow::on_pushButton_3_released()
+void MainWindow::on_pushButton_run_released()
 {
     ui->label_5->setMinimumHeight(400);
     ui->label_5->setMaximumHeight(400);
@@ -642,17 +730,17 @@ void MainWindow::on_pushButton_3_released()
 //reset
 void MainWindow::on_pushButton_clicked()
 {
-    nursePlants = 0;
+    mNnursePlants = 0;
     initialPopulationSizeF = 0;
     initialPopulationSizeUF = 0;
     proportionRatio=0;
     mutationRate=0;
     h2OGroundChange=0;
-    nursePlants=0;
-    generation=0;
-    rngSeed=0;
+    mNnursePlants=0;
+    mGeneration=0;
+    mRngSeed=0;
     temperatureChange=0;
-    ui->spinBox->setValue(0);
+    ui->spinBox_n_f->setValue(0);
     ui->spinBoxMutation->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -663,3 +751,23 @@ void MainWindow::on_pushButton_clicked()
     delay();
 }
 
+bool is_good_spot_for_nurse_plant(
+  const coordinat& c,
+  const plant_coordinats& nurse_plant_coordinats,
+  const int min_dx,
+  const int min_dy
+)
+{
+    // npc: Nurse Plant Coordinat
+    for(const auto& npc: nurse_plant_coordinats)
+    {
+        const int dx=std::abs(npc.first - c.first);
+        const int dy=std::abs(npc.second - c.second);
+        // If too close to a nurse plant, that is not a good spot
+        if(dx<=min_dx && dy<=min_dy) // smaller-equal, as it is the number of squares *between* coordinats
+        {
+            return false;
+        }
+    }
+    return true;
+}
