@@ -159,7 +159,7 @@
              <double>0.100000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.100000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="value">
              <double>0.200000000000000</double>
@@ -172,7 +172,7 @@
              <double>0.100000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.100000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="value">
              <double>0.100000000000000</double>
@@ -230,14 +230,14 @@
              </font>
             </property>
             <property name="text">
-             <string>Actual trait optimum</string>
+             <string>Actual temperature</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="box_trait_optimum">
             <property name="singleStep">
-             <double>0.100000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="value">
              <double>0.500000000000000</double>
