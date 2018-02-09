@@ -36,7 +36,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_5->setPixmap(QPixmap::fromImage(m_image));
     ui->label_10->setHidden(true);
 
-    QObject::connect(ui->spinBox_n_f, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    //Make all parameters involved in initialization trigger CreateGrid
+    QObject::connect(ui->spinBox_init_n_f, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_init_n_uf, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
 
     CreateGrid();
     CreateGraph();
@@ -63,17 +67,24 @@ void MainWindow::delay()
 
     CreateGrid();
 }
+
+#ifdef TOO_SIMPLE_TO_KEEP_IN
+Freely assume all STL functions are know by all C++ programmers
 void MainWindow::set_seed()
 {
-    int seed;
-    seed = ui->spinBox_4->value();
-    srand (seed);
+    //RJCB: simplified
+    std::srand(ui->spinBox_rng_seed->value());
 }
+#endif
+
 //sets proportion ratio F and UF
 
 void MainWindow::SetPixel(const int x, const int y, const QColor color)
 {
+  //RJCB: This '35 +' and '11 +' is completely weird,
+  //  it is needed to draw the grid at the right spot somehow
   m_image.setPixel(35 + x, 11 + y,color.rgb());
+  //m_image.setPixel(x, y,color.rgb());
 }
 
 void MainWindow::SetResolution(const int width, const int height)
@@ -102,6 +113,7 @@ void MainWindow::paintEvent(QPaintEvent *)
     qCritical() << "YStart: " << gridYStart;
     qCritical() << "YEnd: " << gridYEnd;
 }*/
+#ifdef DELETE_UNUSED_CODE
 //draws grid on GUI
 //unused
 void MainWindow::DrawGrid2()
@@ -114,6 +126,7 @@ void MainWindow::DrawGrid2()
         }
     }
 }
+#endif // DELETE_UNUSED_CODE
 
 #ifdef RJCB_REFACTORED
 Moved to add_nurse_plants
@@ -163,9 +176,8 @@ void MainWindow::add_nurse_plants(
   plant_coordinats &nurse_plant_coordinats
 )
 {
-    const int n_nurse_plants = mNnursePlants;
-
-    for(int i=0; i<n_nurse_plants; ++i)
+    while (static_cast<int>(nurse_plant_coordinats.size())
+      < ui->spinBox_n_nurse->value())
     {
         //Pick a random spot to potentially put a nurse plant
         const int x=rand() % g[0].size(); //RJCB: Made more local and const
@@ -174,6 +186,10 @@ void MainWindow::add_nurse_plants(
         if (is_good_spot_for_nurse_plant(c, nurse_plant_coordinats))
         {
           nurse_plant_coordinats.push_back(c);
+          assert(y >= 0);
+          assert(y < static_cast<int>(g.size()));
+          assert(x >= 0);
+          assert(x < static_cast<int>(g[y].size()));
           g[c.second][c.first]=blue;
 
         }
@@ -371,8 +387,8 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
   plant_coordinats &unfacilitated_plant
 )
 {
-    int n_facilitated_plants_to_add = initialPopulationSizeF;
-    int n_unfacilitated_plants_to_add = initialPopulationSizeUF;
+    int n_facilitated_plants_to_add = ui->spinBox_init_n_f->value();
+    int n_unfacilitated_plants_to_add = ui->spinBox_init_n_uf->value();
     assert(n_facilitated_plants_to_add >= 0);
     assert(n_unfacilitated_plants_to_add >= 0);
     plant_coordinats seeds;
@@ -381,21 +397,16 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
     while(n_facilitated_plants_to_add+n_unfacilitated_plants_to_add>0)
     {
       //Create a random seed
-      qCritical() << ".";
       const int x=rand() % g[0].size();
       const int y=rand() % g.size();
       const coordinat c(x,y);
       seeds.push_back(c);
-      //int position_difference_x = 0; //RJCB: Unused here
-      //int position_difference_y = 0; //RJCB: Unused here
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
       position_in_relation_to_plants(
         g,
         nurse_plant,
         seeds,
-        //position_difference_x, //RJCB: Unused here
-        //position_difference_y, //RJCB: Unused here
         facilitated_plant,
         unfacilitated_plant,
         c,
@@ -489,7 +500,6 @@ void MainWindow::nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g)
 
 void MainWindow::DrawGrid(const yx_grid& g)
 {
-    qCritical() << __FUNCTION__;
     const int n_rows = g.size();
     for(int i=0; i<n_rows; ++i)
     {
@@ -498,24 +508,21 @@ void MainWindow::DrawGrid(const yx_grid& g)
         const int n_cols = g[i].size();
         for(int j=0; j<n_cols; ++j)
         {
+            assert(j >= 0);
             assert(j < static_cast<int>(g[i].size()));
             SetPixel(i,j,g[i][j]);
         }
     }
 }
+
 void MainWindow::set_plants(yx_grid& g)
 {
-    qCritical() << __FUNCTION__;
-    plant_coordinats nurse_plant;
-    qCritical() << __LINE__;
+    plant_coordinats nurse_plant_coordinats;
     plant_coordinats facilitated_plant;
-    qCritical() << __LINE__;
     plant_coordinats unfacilitated_plant;
-    qCritical() << __LINE__;
-    add_nurse_plants(g, nurse_plant);
-    qCritical() << __LINE__;
-    set_facilitated_and_unfacilitated_plants(g, nurse_plant, facilitated_plant, unfacilitated_plant);
-    qCritical() << __LINE__;
+    add_nurse_plants(g, nurse_plant_coordinats);
+    assert(static_cast<int>(nurse_plant_coordinats.size()) == ui->spinBox_n_nurse->value());
+    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant, unfacilitated_plant);
     #ifdef NOT_NOW
     if(m_generation > 0)
     {
@@ -525,17 +532,18 @@ void MainWindow::set_plants(yx_grid& g)
 }
 void MainWindow::CreateGrid()
 {
-    qCritical() << __FUNCTION__;
-    usingColor = blue;
+    //usingColor = blue;
     //SetGridResolution();
-    set_seed();
-    auto grid = create_vector_grid(60,50);
+
+    //RJCB: set seed here
+    std::srand(ui->spinBox_rng_seed->value());
+    auto grid = create_vector_grid(60,50,brown);
     set_plants(grid);
     DrawGrid(grid);
+    this->update();
 }
 void MainWindow::RemoveGrid()
 {
-    usingColor = white;
     CreateGrid();
 }
 
@@ -611,11 +619,11 @@ void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
 }
 void MainWindow::setPopulationSize(double value)
 {
-    if(ui->spinBox_n_f->value() != 0)
+    if(ui->spinBox_init_n_f->value() != 0)
     {
-        value = value * ui->spinBox_n_f->value();
+        value = value * ui->spinBox_init_n_f->value();
     }
-    ui->spinBox_2->setValue(value);
+    ui->spinBox_init_n_uf->setValue(value);
 }
 //button slots
 //-------------------
@@ -631,15 +639,20 @@ void MainWindow::on_spinBoxMutation_valueChanged(double arg1)
     mutationRate = arg1;
 }
 //value changed F spinbox
+
+#ifdef DO_THIS_WHEN_NEEDED
+Just read those values at the start of a simulation
 void MainWindow::on_spinBox_n_f_valueChanged(int arg1)
 {
     initialPopulationSizeF = arg1;
 }
 //value chnaged UF spinbox
-void MainWindow::on_spinBox_2_valueChanged(int arg1)
+void MainWindow::on_spinBox_n_uf_valueChanged(int arg1)
 {
     initialPopulationSizeUF = arg1;
 }
+#endif // DO_THIS_WHEN_NEEDED
+
 //proportion ratio slider
 void MainWindow::on_proportionRatioUF_valueChanged(double arg1)
 {
@@ -668,24 +681,30 @@ void MainWindow::on_doubleSpinBox_7_valueChanged(double arg1)
 {
     temperatureChange = arg1;
 }
+
 //fixed proportion of Nurse Plants
-void MainWindow::on_spinBox_5_valueChanged(int arg1)
+/*
+void MainWindow::on_spinBox_n_nurse_valueChanged(int arg1)
 {
     mNnursePlants = arg1;
 }
+*/
+
 //H2O ground change
 void MainWindow::on_doubleSpinBox_5_valueChanged(double arg1)
 {
     h2OGroundChange = arg1;
 }
 //RNG
-void MainWindow::on_spinBox_4_valueChanged(int arg1)
+void MainWindow::on_spinBox_4_valueChanged(int)
 {
-    mRngSeed = arg1;
+    //mRngSeed = arg1;
     mGeneration = 0;
     ui->horizontalSlider_2->setValue(0);
     ui->spinBox_3->setValue(0);
-    set_seed();
+
+    //RJCB: set seed directly
+    std::srand(ui->spinBox_rng_seed->value());
 }
 //show grid
 void MainWindow::on_pushButton_6_clicked()
@@ -730,25 +749,53 @@ void MainWindow::on_pushButton_run_released()
 //reset
 void MainWindow::on_pushButton_clicked()
 {
-    mNnursePlants = 0;
-    initialPopulationSizeF = 0;
-    initialPopulationSizeUF = 0;
-    proportionRatio=0;
+    //proportionRatio=0;
     mutationRate=0;
     h2OGroundChange=0;
-    mNnursePlants=0;
     mGeneration=0;
-    mRngSeed=0;
+    //mRngSeed=0;
     temperatureChange=0;
-    ui->spinBox_n_f->setValue(0);
+    ui->spinBox_init_n_f->setValue(0);
     ui->spinBoxMutation->setValue(0);
-    ui->spinBox_2->setValue(0);
+    ui->spinBox_init_n_uf->setValue(0);
     ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
+    ui->spinBox_n_nurse->setValue(0);
     ui->doubleSpinBox_5->setValue(0);
     ui->doubleSpinBox_7->setValue(0);
     delay();
+}
+
+///-----------------------------------------------------------------------------
+///RJCB put his functions here sorted alphabetically,
+/// as there appeared to be no order in the place of functions
+///-----------------------------------------------------------------------------
+void MainWindow::ClearGrid(const yx_grid& g)
+{
+    const int n_rows = g.size();
+    for(int i=0; i<n_rows; ++i)
+    {
+        assert(i >= 0);
+        assert(i < static_cast<int>(g.size()));
+        const int n_cols = g[i].size();
+        for(int j=0; j<n_cols; ++j)
+        {
+            assert(j >= 0);
+            assert(j < static_cast<int>(g[i].size()));
+            SetPixel(i,j,brown);
+        }
+    }
+}
+
+yx_grid create_vector_grid(
+  const int n_rows,
+  const int n_columns,
+  QColor color
+)
+{
+  ///RJCB: simplified it a bit
+  assert(n_rows > 0);
+  assert(n_columns > 0);
+  return yx_grid(n_rows, std::vector<QColor>(n_columns, color));
 }
 
 bool is_good_spot_for_nurse_plant(

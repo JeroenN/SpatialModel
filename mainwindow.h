@@ -44,16 +44,17 @@ public slots:
 
     void on_spinBoxMutation_valueChanged(double arg1);
 
-    void on_spinBox_n_f_valueChanged(int arg1);
+    //RJCB: Does not do anything useful
+    //void on_spinBox_n_f_valueChanged(int arg1);
 
-    void on_spinBox_2_valueChanged(int arg1);
+    //RJCB: Does not do anything useful
+    //void on_spinBox_n_uf_valueChanged(int arg1);
 
     void CreateGraph();
     void CreateGrid();
     void RemoveGrid();
-    void DrawGrid2();
+
     //void SetGridResolution();
-    void set_seed();
     void delay();
 
 
@@ -84,8 +85,8 @@ public slots:
 
  private slots:
 
-
-    void on_spinBox_5_valueChanged(int arg1);
+    //RJCB: Removed mNnursePlants to avoid data duplication
+    //void on_spinBox_n_nurse_valueChanged(int arg1);
 
     void on_pushButton_run_pressed();
 
@@ -108,16 +109,16 @@ public slots:
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;
 
-    int initialPopulationSizeF; //RJCB: Made this an int, was a float
-    int initialPopulationSizeUF; //RJCB: Made this an int, was a float
-    float proportionRatio;
+    //int initialPopulationSizeF; //RJCB: Made this an int, was a float
+    //int initialPopulationSizeUF; //RJCB: Made this an int, was a float
+    //float proportionRatio; //RJCB: Unused, thus removed
     float mutationRate;
     float h2OGroundChange;
 
     ///The number of nurse plants
-    int mNnursePlants; //RJCB: Made this an int, was a float
+    //int mNnursePlants; //RJCB: Made this an int, was a float
     int mGeneration = 0;
-    int mRngSeed;
+    //int mRngSeed; //RJCB: Just read from GUI
     float temperatureChange;
     std::vector<float> fXAppends;
     std::vector<float> fYAppends;
@@ -128,39 +129,25 @@ public slots:
     //std::vector<std::vector<int> > theGrid; //RJCB: You didn't use this one
 
     QImage m_image;
-    QColor green = QColor(57,188,31);
-    QColor brown = QColor(149,113,39);
-    QColor blue = QColor(56,119,182);
-    QColor usingColor = QColor(0,0,0);
-    QColor white =  QColor(239,235,231);
-    QColor red = QColor(255,0,0);
+    const QColor green = QColor(57,188,31);
+    const QColor brown = QColor(149,113,39);
+    const QColor blue = QColor(56,119,182);
+    //QColor usingColor = QColor(0,0,0); //RJCB: Only added state, without value
+    const QColor white =  QColor(239,235,231);
+    const QColor red = QColor(255,0,0);
     int gridXStart;
     int gridXEnd;
     int gridYStart;
     int gridYEnd;
 
+    ///The history of all plants
     generations generation_coordinates;
-    yx_grid g;
-    yx_grid create_vector_grid(int n_rows, int n_columns)
-    {
-       yx_grid grid;
-       std::vector<QColor> column;
 
-       for(int i=0; i<n_columns; ++i)
-       {
-            if(i == 0)
-            {
-                usingColor = brown;
-            }
-           column.push_back(usingColor);
-       }
-       for(int i=0; i<n_rows; ++i)
-       {
-           grid.push_back(column);
-       }
+    //yx_grid g; //RJCB: Unused, so removed
 
-       return grid;
-    }
+    ///Clear the GUI grid
+    /// Note: only using g for size :-(
+    void ClearGrid(const yx_grid& g);
 
     void DrawGrid(const yx_grid& g);
 
@@ -195,10 +182,12 @@ public slots:
 
 
 
+    //void set_seed(); //RJCB: Too simple to keep in
 
-
-
+    //void DrawGrid2(); //RJCB: Unused code should be deleted
 };
+
+yx_grid create_vector_grid(int n_rows, int n_columns, QColor color);
 
 ///See if coordinat c would be a good spot for a nurse plant.
 ///Will be false if c is too close to another nurse plant

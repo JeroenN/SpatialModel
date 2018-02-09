@@ -1,3 +1,6 @@
+///RJCB: Please pick a naming scheme,
+///  either camelCase or snake_case,
+///  and follow it consistently
 #include "mainwindow.h"
 #include "explanation.h"
 #include <QApplication>
