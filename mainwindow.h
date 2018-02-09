@@ -8,6 +8,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QScatterSeries>
+#include <QtCharts/QBarSet>
 #include "explanation.h"
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickView>
@@ -104,12 +105,18 @@ public slots:
  private:
     Ui::MainWindow *ui;
     Explanation *explanation;
-    QChart *mChart;
-    QGraphicsScene *mScene;
-    QLineSeries *mSeriesFacilitated;
-    QLineSeries *mSeriesUnfacilitated;
-    QChartView *mChartView;
-    //QChartView *usingChartView;
+    QChart *mFitnessChart;
+    QLineSeries *mFitnessSeriesFacilitated;
+    QLineSeries *mFitnessSeriesUnfacilitated  ;
+    QChartView *mFitnessChartView;
+
+    ///Bar chart to display the number of seeds
+    ///produced by both facilitated and
+    ///unfacilitated plants
+    QChart *mNumberOfSeedsChart;
+    QChartView *mNumberOfSeedsChartView;
+    QBarSet * mNumberOfSeedsFacilitatedSet;
+    QBarSet * mNumberOfSeedsUnfacilitatedSet;
 
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;

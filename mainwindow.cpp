@@ -23,33 +23,63 @@ using namespace QtCharts;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    mChart(new QChart),
-    mScene(new QGraphicsScene),
-    mSeriesFacilitated(new QLineSeries),
-    mSeriesUnfacilitated(new QLineSeries)
+    mFitnessChart(new QChart),
+    mFitnessSeriesFacilitated(new QLineSeries),
+    mFitnessSeriesUnfacilitated(new QLineSeries),
+    mNumberOfSeedsChart(new QChart)
 {
     ui->setupUi(this);
 
-    //Setup all chart-related things
-    mChartView = new QChartView(mChart);
-    mChartView->setRenderHint(QPainter::Antialiasing);
-    ui->widget->layout()->addWidget(mChartView);
-    mChartView->setScene(mScene);
-    mScene->addItem(mChart);
-    mChart->createDefaultAxes();
-    mChart->setTitle("How fitness depends on your neighbours");
-    mChart->addSeries(mSeriesUnfacilitated);
-    mChart->addSeries(mSeriesFacilitated);
-    QValueAxis *axisX = new QValueAxis;
-    axisX->setRange(0,1.0);
-    axisX->setTitleText("Trait value");
-    QValueAxis *axisY = new QValueAxis;
-    axisY->setTitleText("Fitness");
-    //axisY->setRange(0,0.1);
-    mChart->setAxisX(axisX);
-    mChart->setAxisY(axisY);
-    mSeriesFacilitated->setName("Facilitated");
-    mSeriesUnfacilitated->setName("Unfacilitated");
+    //Setup all fitness chart-related things
+    {
+      mFitnessChartView = new QChartView(mFitnessChart);
+      mFitnessChartView->setRenderHint(QPainter::Antialiasing);
+      ui->widget->layout()->addWidget(mFitnessChartView);
+      mFitnessChart->createDefaultAxes();
+      mFitnessChart->setTitle("How fitness depends on your neighbours");
+      mFitnessChart->addSeries(mFitnessSeriesUnfacilitated);
+      mFitnessChart->addSeries(mFitnessSeriesFacilitated);
+      QValueAxis *axisX = new QValueAxis;
+      axisX->setRange(0,1.0);
+      axisX->setTitleText("Trait value");
+      QValueAxis *axisY = new QValueAxis;
+      axisY->setTitleText("Fitness");
+      //axisY->setRange(0,0.1);
+      mFitnessChart->setAxisX(axisX);
+      mFitnessChart->setAxisY(axisY);
+      mFitnessSeriesFacilitated->setName("Facilitated");
+      mFitnessSeriesUnfacilitated->setName("Unfacilitated");
+    }
+    //Setup all fitness chart-related things
+    {
+      mNumberOfSeedsChartView = new QChartView(mNumberOfSeedsChart);
+      mNumberOfSeedsChartView->setRenderHint(QPainter::Antialiasing);
+      ui->widget->layout()->addWidget(mNumberOfSeedsChartView);
+      mNumberOfSeedsChart->createDefaultAxes();
+      mNumberOfSeedsChart->setTitle("Number of seeds produced");
+      mNumberOfSeedsFacilitatedSet = new QBarSet("Facilitated");
+      mNumberOfSeedsUnfacilitatedSet = new QBarSet("Unfacilitated");
+      *mNumberOfSeedsFacilitatedSet << 10;
+      *mNumberOfSeedsUnfacilitatedSet << 100;
+      QBarSeries *series = new QBarSeries();
+      series->append(mNumberOfSeedsFacilitatedSet);
+      series->append(mNumberOfSeedsUnfacilitatedSet);
+      mNumberOfSeedsChart->addSeries(series);
+
+      //mNumberOfSeedsChart->addSeries(mFitnessSeriesUnfacilitated);
+      //mNumberOfSeedsChart->addSeries(mFitnessSeriesFacilitated);
+      //QValueAxis *axisX = new QValueAxis;
+      //axisX->setRange(0,1.0);
+      //axisX->setTitleText("Trait value");
+      //QValueAxis *axisY = new QValueAxis;
+      //axisY->setTitleText("Fitness");
+      //axisY->setRange(0,0.1);
+      //mFitnessChart->setAxisX(axisX);
+      //mFitnessChart->setAxisY(axisY);
+      //mFitnessSeriesFacilitated->setName("Facilitated");
+      //mFitnessSeriesUnfacilitated->setName("Unfacilitated");
+    }
+
 
     //m_image = new QImage();
     //ui->pushButton_2->setHidden(true);
@@ -604,21 +634,21 @@ void MainWindow::ShowFitnessGraph()
     ffs.push_back(normal(x, f_optimum, f_sd));
   }
 
-  mChart->show();
+  mFitnessChart->show();
 
-  mSeriesFacilitated->clear();
+  mFitnessSeriesFacilitated->clear();
   //appends F plants
   for (int i=0; i!=n_points; ++i)
   {
-      mSeriesFacilitated->append(xs[i], ffs[i]);
+      mFitnessSeriesFacilitated->append(xs[i], ffs[i]);
   }
-  mSeriesUnfacilitated->clear();
+  mFitnessSeriesUnfacilitated->clear();
   //appends UF plants
   for (int i=0; i!=n_points; ++i)
   {
-      mSeriesUnfacilitated->append(xs[i], ufs[i]);
+      mFitnessSeriesUnfacilitated->append(xs[i], ufs[i]);
   }
-  mChart->show();
+  mFitnessChart->show();
 
 }
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
