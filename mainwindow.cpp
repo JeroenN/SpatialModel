@@ -523,12 +523,10 @@ void MainWindow::set_plants(yx_grid& g)
     add_nurse_plants(g, nurse_plant_coordinats);
     assert(static_cast<int>(nurse_plant_coordinats.size()) == ui->spinBox_n_nurse->value());
     set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant, unfacilitated_plant);
-    #ifdef NOT_NOW
-    if(m_generation > 0)
+    if(ui->spinBox_generation->value() > 0)
     {
-        GenerateGeneration(g, nurse_plant);
+        GenerateGeneration(g, nurse_plant_coordinats);
     }
-    #endif // NOT_NOW
 }
 void MainWindow::CreateGrid()
 {
@@ -661,7 +659,7 @@ void MainWindow::on_proportionRatioUF_valueChanged(double arg1)
 //generation slider
 void MainWindow::on_horizontalSlider_2_valueChanged(int value)
 {
-    ui->spinBox_3->setValue(value);
+    ui->spinBox_generation->setValue(value);
 }
 //generation
 void MainWindow::on_spinBox_3_valueChanged(int arg1)
@@ -701,7 +699,7 @@ void MainWindow::on_spinBox_4_valueChanged(int)
     //mRngSeed = arg1;
     mGeneration = 0;
     ui->horizontalSlider_2->setValue(0);
-    ui->spinBox_3->setValue(0);
+    ui->spinBox_generation->setValue(0);
 
     //RJCB: set seed directly
     std::srand(ui->spinBox_rng_seed->value());
@@ -758,9 +756,8 @@ void MainWindow::on_pushButton_clicked()
     ui->spinBox_init_n_f->setValue(0);
     ui->spinBoxMutation->setValue(0);
     ui->spinBox_init_n_uf->setValue(0);
-    ui->spinBox_3->setValue(0);
+    ui->spinBox_generation->setValue(0);
     ui->spinBox_n_nurse->setValue(0);
-    ui->doubleSpinBox_5->setValue(0);
     ui->doubleSpinBox_7->setValue(0);
     delay();
 }
