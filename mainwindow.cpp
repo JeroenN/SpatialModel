@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     mChart(new QChart),
     mScene(new QGraphicsScene),
-    mSeriesFacilitated(new QSplineSeries),
-    mSeriesUnfacilitated(new QSplineSeries)
+    mSeriesFacilitated(new QLineSeries),
+    mSeriesUnfacilitated(new QLineSeries)
 {
     ui->setupUi(this);
 
@@ -36,6 +36,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->widget->layout()->addWidget(mChartView);
     mChartView->setScene(mScene);
     mScene->addItem(mChart);
+    mChart->createDefaultAxes();
+    mChart->setTitle("How fitness depends on your neighbours");
+    mChart->addSeries(mSeriesUnfacilitated);
+    mChart->addSeries(mSeriesFacilitated);
+    QValueAxis *axisX = new QValueAxis;
+    axisX->setRange(0,1.0);
+    axisX->setTitleText("Trait value");
+    QValueAxis *axisY = new QValueAxis;
+    axisY->setTitleText("Fitness");
+    //axisY->setRange(0,0.1);
+    mChart->setAxisX(axisX);
+    mChart->setAxisY(axisY);
+    mSeriesFacilitated->setName("Facilitated");
+    mSeriesUnfacilitated->setName("Unfacilitated");
 
     //m_image = new QImage();
     //ui->pushButton_2->setHidden(true);
@@ -49,11 +63,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_10->setHidden(true);
 
     //Make all parameters involved in initialization trigger CreateGrid
-    QObject::connect(ui->spinBox_init_n_f, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
-    QObject::connect(ui->spinBox_init_n_uf, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
-    QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
-    QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
-    ShowStart();
+    QObject::connect(ui->spinBox_init_n_f, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_init_n_uf, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    CreateGrid();
+
+    QObject::connect(ui->box_fit_fac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
+    QObject::connect(ui->box_fit_fac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
+    QObject::connect(ui->box_fit_unfac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
+    QObject::connect(ui->box_fit_unfac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowFitnessGraph()));
+
+    ShowFitnessGraph();
+    //ShowStart();
 }
 
 MainWindow::~MainWindow()
@@ -568,8 +590,8 @@ void MainWindow::ShowFitnessGraph()
   for (int i=0; i!=n_points; ++i)
   {
     const double x{xs[i]};
-    const double u_optimum = 3.0;
-    const double u_sd = 1.0;
+    const double u_optimum = ui->box_fit_unfac_opt->value();
+    const double u_sd = ui->box_fit_unfac_sd->value();
     ufs.push_back(normal(x, u_optimum, u_sd));
   }
 
@@ -577,8 +599,8 @@ void MainWindow::ShowFitnessGraph()
   for (int i=0; i!=n_points; ++i)
   {
     const double x{xs[i]};
-    const double f_optimum = 6.0;
-    const double f_sd = 2.0;
+    const double f_optimum = ui->box_fit_fac_opt->value();
+    const double f_sd = ui->box_fit_fac_sd->value();
     ffs.push_back(normal(x, f_optimum, f_sd));
   }
 
@@ -590,25 +612,13 @@ void MainWindow::ShowFitnessGraph()
   {
       mSeriesFacilitated->append(xs[i], ffs[i]);
   }
-  mChart->addSeries(mSeriesFacilitated);
   mSeriesUnfacilitated->clear();
   //appends UF plants
   for (int i=0; i!=n_points; ++i)
   {
       mSeriesUnfacilitated->append(xs[i], ufs[i]);
   }
-  mChart->addSeries(mSeriesUnfacilitated);
-
-   //mChart->legend()->hide();
-   mChart->createDefaultAxes();
-   mChart->setTitle("How fitness depends on your neighbours");
-   mChart->show();
-   QValueAxis *axisX = new QValueAxis;
-   axisX->setTitleText("Trait value");
-   QValueAxis *axisY = new QValueAxis;
-   axisY->setTitleText("Fitness");
-   mChart->setAxisX(axisX, mSeriesFacilitated);
-   mChart->setAxisY(axisY, mSeriesFacilitated);
+  mChart->show();
 
 }
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)

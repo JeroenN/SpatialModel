@@ -7,6 +7,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+#include <QtCharts/QScatterSeries>
 #include "explanation.h"
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickView>
@@ -108,7 +109,7 @@ public slots:
     QLineSeries *mSeriesFacilitated;
     QLineSeries *mSeriesUnfacilitated;
     QChartView *mChartView;
-    QChartView *usingChartView;
+    //QChartView *usingChartView;
 
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;
