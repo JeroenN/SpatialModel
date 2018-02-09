@@ -22,9 +22,21 @@ using namespace QtCharts;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    mChart(new QChart),
+    mScene(new QGraphicsScene),
+    mSeriesFacilitated(new QSplineSeries),
+    mSeriesUnfacilitated(new QSplineSeries)
 {
     ui->setupUi(this);
+
+    //Setup all chart-related things
+    mChartView = new QChartView(mChart);
+    mChartView->setRenderHint(QPainter::Antialiasing);
+    ui->widget->layout()->addWidget(mChartView);
+    mChartView->setScene(mScene);
+    mScene->addItem(mChart);
+
     //m_image = new QImage();
     //ui->pushButton_2->setHidden(true);
     ui->pushButton_6->setHidden(true);
@@ -33,19 +45,15 @@ MainWindow::MainWindow(QWidget *parent) :
     //RJCB: Load from resources file, spatial-model.qrc
     m_image.load(":/pics/Grid.png");
 
-    ui->label_5->setPixmap(QPixmap::fromImage(m_image));
+    ui->label_grid->setPixmap(QPixmap::fromImage(m_image));
     ui->label_10->setHidden(true);
 
     //Make all parameters involved in initialization trigger CreateGrid
-    QObject::connect(ui->spinBox_init_n_f, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
-    QObject::connect(ui->spinBox_init_n_uf, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
-    QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
-    QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
-
-    CreateGrid();
-    CreateGraph();
-
-
+    QObject::connect(ui->spinBox_init_n_f, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
+    QObject::connect(ui->spinBox_init_n_uf, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
+    QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
+    QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(ShowStart()));
+    ShowStart();
 }
 
 MainWindow::~MainWindow()
@@ -61,8 +69,8 @@ void MainWindow::delay()
      {
         QCoreApplication::processEvents(QEventLoop::AllEvents , 100);
      }
-    ui->label_5->setMinimumHeight(400);
-    ui->label_5->setMaximumHeight(400);
+    ui->label_grid->setMinimumHeight(400);
+    ui->label_grid->setMaximumHeight(400);
     ui->label_10->setHidden(true);
 
     CreateGrid();
@@ -546,67 +554,61 @@ void MainWindow::RemoveGrid()
 }
 
 //creates graph
-void MainWindow::CreateGraph()
+void MainWindow::ShowFitnessGraph()
 {
-    //test code
-    fXAppends.push_back(1);
-    fYAppends.push_back(1);
-    fXAppends.push_back(1.5);
-    fYAppends.push_back(3);
-    fXAppends.push_back(2);
-    fYAppends.push_back(10);
-    fXAppends.push_back(2.5);
-    fYAppends.push_back(3);
-    fXAppends.push_back(3);
-    fYAppends.push_back(1);
+  //Create a timeseries from 0.0-10.0 in steps of 0.1
+  const int n_points{100};
+  std::vector<double> xs;
+  for (int i=0; i!=n_points; ++i)
+  {
+    xs.push_back(static_cast<double>(i) / 10.0);
+  }
+  //Unfacilitated plant fitnesses
+  std::vector<double> ufs;
+  for (int i=0; i!=n_points; ++i)
+  {
+    const double x{xs[i]};
+    const double u_optimum = 3.0;
+    const double u_sd = 1.0;
+    ufs.push_back(normal(x, u_optimum, u_sd));
+  }
 
+  std::vector<double> ffs;
+  for (int i=0; i!=n_points; ++i)
+  {
+    const double x{xs[i]};
+    const double f_optimum = 6.0;
+    const double f_sd = 2.0;
+    ffs.push_back(normal(x, f_optimum, f_sd));
+  }
 
-    uFXAppends.push_back(1);
-    uFYAppends.push_back(0.5);
-    uFXAppends.push_back(1.5);
-    uFYAppends.push_back(3.5);
-    uFXAppends.push_back(2);
-    uFYAppends.push_back(10.5);
-    uFXAppends.push_back(2.5);
-    uFYAppends.push_back(3);
-    uFXAppends.push_back(3);
-    uFYAppends.push_back(0.5);
-    //end test code
-    chart = new QChart();
-    scene = new QGraphicsScene;
-    fSeries = new QSplineSeries();
-    uFSeries = new QSplineSeries();
-    chart->show();
+  mChart->show();
 
-    //appends F plants
-    for(unsigned i = 0; i < fXAppends.size(); i++)
-    {
-        fSeries->append(fXAppends[i], fYAppends[i]);
-    }
-    chart->addSeries(fSeries);
-    //appends UF plants
-    for(unsigned i = 0; i < uFXAppends.size(); i++)
-    {
-        uFSeries->append(uFXAppends[i], uFYAppends[i]);
-    }
-    chart->addSeries(uFSeries);
+  mSeriesFacilitated->clear();
+  //appends F plants
+  for (int i=0; i!=n_points; ++i)
+  {
+      mSeriesFacilitated->append(xs[i], ffs[i]);
+  }
+  mChart->addSeries(mSeriesFacilitated);
+  mSeriesUnfacilitated->clear();
+  //appends UF plants
+  for (int i=0; i!=n_points; ++i)
+  {
+      mSeriesUnfacilitated->append(xs[i], ufs[i]);
+  }
+  mChart->addSeries(mSeriesUnfacilitated);
 
-     chart->legend()->hide();
-     chart->createDefaultAxes();
-     chart->setTitle("Fitness");
-     chart->show();
-     chartView = new QChartView(chart);
-     QValueAxis *axisX = new QValueAxis;
-     axisX->setTitleText("Optimum");
-     QValueAxis *axisY = new QValueAxis;
-     axisY->setTitleText("Amount of F/UF plants");
-     chart->setAxisX(axisX, fSeries);
-     chart->setAxisY(axisY, fSeries);
-     chartView->setRenderHint(QPainter::Antialiasing);
-     ui->widget->layout()->addWidget(chartView);
-
-     chartView->setScene(scene);
-     scene->addItem(chart);
+   //mChart->legend()->hide();
+   mChart->createDefaultAxes();
+   mChart->setTitle("How fitness depends on your neighbours");
+   mChart->show();
+   QValueAxis *axisX = new QValueAxis;
+   axisX->setTitleText("Trait value");
+   QValueAxis *axisY = new QValueAxis;
+   axisY->setTitleText("Fitness");
+   mChart->setAxisX(axisX, mSeriesFacilitated);
+   mChart->setAxisY(axisY, mSeriesFacilitated);
 
 }
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
@@ -710,8 +712,8 @@ void MainWindow::on_pushButton_6_clicked()
     ui->pushButton_7->setHidden(false);
     ui->pushButton_6->setHidden(true);
     //ui->tableWidget->setHidden(false);
-    ui->label_5->setMinimumHeight(400);
-    ui->label_5->setMaximumHeight(400);
+    ui->label_grid->setMinimumHeight(400);
+    ui->label_grid->setMaximumHeight(400);
     CreateGrid();
 
 }
@@ -721,16 +723,16 @@ void MainWindow::on_pushButton_7_clicked()
     ui->pushButton_6->setHidden(false);
     ui->pushButton_7->setHidden(true);
     //ui->tableWidget->setHidden(true);
-    ui->label_5->setMaximumHeight(0);
-    ui->label_5->setMinimumHeight(0);
+    ui->label_grid->setMaximumHeight(0);
+    ui->label_grid->setMinimumHeight(0);
     RemoveGrid();
 }
 
 //run
 void MainWindow::on_pushButton_run_pressed()
 {
-    ui->label_5->setMaximumHeight(0);
-    ui->label_5->setMinimumHeight(0);
+    ui->label_grid->setMaximumHeight(0);
+    ui->label_grid->setMinimumHeight(0);
     ui->label_10->setHidden(false);
     RemoveGrid();
     generation_coordinates.clear();
@@ -739,8 +741,8 @@ void MainWindow::on_pushButton_run_pressed()
 //run
 void MainWindow::on_pushButton_run_released()
 {
-    ui->label_5->setMinimumHeight(400);
-    ui->label_5->setMaximumHeight(400);
+    ui->label_grid->setMinimumHeight(400);
+    ui->label_grid->setMaximumHeight(400);
     ui->label_10->setHidden(true);
     CreateGrid();
 }
@@ -766,6 +768,14 @@ void MainWindow::on_pushButton_clicked()
 ///RJCB put his functions here sorted alphabetically,
 /// as there appeared to be no order in the place of functions
 ///-----------------------------------------------------------------------------
+
+void MainWindow::ShowStart()
+{
+    CreateGrid();
+    ShowFitnessGraph();
+}
+
+/*
 void MainWindow::ClearGrid(const yx_grid& g)
 {
     const int n_rows = g.size();
@@ -782,6 +792,7 @@ void MainWindow::ClearGrid(const yx_grid& g)
         }
     }
 }
+*/
 
 yx_grid create_vector_grid(
   const int n_rows,
@@ -814,4 +825,14 @@ bool is_good_spot_for_nurse_plant(
         }
     }
     return true;
+}
+
+double gauss(const double x, const double sd) noexcept
+{
+  return std::exp(-(x * x) / (2.0 * sd * sd));
+}
+
+double normal(const double x, const double mean, const double sd) noexcept
+{
+  return gauss(x - mean, sd);
 }

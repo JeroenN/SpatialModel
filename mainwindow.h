@@ -50,9 +50,13 @@ public slots:
     //RJCB: Does not do anything useful
     //void on_spinBox_n_uf_valueChanged(int arg1);
 
-    void CreateGraph();
+    void ShowFitnessGraph();
     void CreateGrid();
     void RemoveGrid();
+
+    ///Show how the current parameters have an effect on
+    ///the starting grid and graphs
+    void ShowStart();
 
     //void SetGridResolution();
     void delay();
@@ -99,11 +103,11 @@ public slots:
  private:
     Ui::MainWindow *ui;
     Explanation *explanation;
-    QChart *chart;
-    QGraphicsScene *scene;
-    QLineSeries *fSeries;
-    QLineSeries *uFSeries;
-    QChartView *chartView;
+    QChart *mChart;
+    QGraphicsScene *mScene;
+    QLineSeries *mSeriesFacilitated;
+    QLineSeries *mSeriesUnfacilitated;
+    QChartView *mChartView;
     QChartView *usingChartView;
 
     QGraphicsScene *gridScene;
@@ -120,10 +124,6 @@ public slots:
     int mGeneration = 0;
     //int mRngSeed; //RJCB: Just read from GUI
     float temperatureChange;
-    std::vector<float> fXAppends;
-    std::vector<float> fYAppends;
-    std::vector<float> uFXAppends;
-    std::vector<float> uFYAppends;
 
     //grid
     //std::vector<std::vector<int> > theGrid; //RJCB: You didn't use this one
@@ -147,7 +147,7 @@ public slots:
 
     ///Clear the GUI grid
     /// Note: only using g for size :-(
-    void ClearGrid(const yx_grid& g);
+    //void ClearGrid(const yx_grid& g);
 
     void DrawGrid(const yx_grid& g);
 
@@ -188,6 +188,14 @@ public slots:
 };
 
 yx_grid create_vector_grid(int n_rows, int n_columns, QColor color);
+
+/// Return a normal distribution (with mean zero and standard
+/// deviation of sd) density at x. Will be heighest at x equals zero
+double gauss(const double x, const double sd) noexcept;
+
+/// Return a normal distribution (with a mean value at mean and standard
+/// deviation of sd) at x. Will be heighest at x equals mean
+double normal(const double x, const double mean, const double sd) noexcept;
 
 ///See if coordinat c would be a good spot for a nurse plant.
 ///Will be false if c is too close to another nurse plant
