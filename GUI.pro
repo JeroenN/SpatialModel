@@ -24,20 +24,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     explanation.cpp \
     grid.cpp
 
 HEADERS += \
-        mainwindow.h \
-    explanation.h \
+    mainwindow.h \
     explanation.h \
     grid.h
 
 FORMS += \
-        mainwindow.ui \
+    mainwindow.ui \
     explanation.ui
 
 DISTFILES += \
     Grid.qml
+
+RESOURCES += \
+    spatial-model.qrc
