@@ -99,10 +99,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->label_10->setHidden(true);
 
     //Make all parameters involved in initialization trigger CreateGrid
+<<<<<<< HEAD
 
     QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
     QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
     QObject::connect(ui->spinBox_init_n_seeds, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+=======
+    QObject::connect(ui->spinBox_init_n_f, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_init_n_uf, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
     CreateGrid();
 
     QObject::connect(ui->box_fit_fac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
@@ -393,7 +400,12 @@ void MainWindow::position_in_relation_to_plants(
   plant_coordinats &facilitated_plant,
   plant_coordinats &unfacilitated_plant,
   const coordinat& c,
+<<<<<<< HEAD
   int &n_seeds_to_add
+=======
+  int &n_facilitated_plants_to_add,
+  int &n_unfacilitated_plants_to_add
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
 )
 {
     bool make_facilitated_plant=false;
@@ -418,26 +430,42 @@ void MainWindow::position_in_relation_to_plants(
             stop_facilitated
         );
     }
+<<<<<<< HEAD
     if(make_facilitated_plant==true && n_seeds_to_add>0)
+=======
+    if(make_facilitated_plant==true && n_facilitated_plants_to_add>0)
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
     {
          g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=green;
          facilitated_plant.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant)==true)
          {
+<<<<<<< HEAD
             --n_seeds_to_add;
+=======
+            --n_facilitated_plants_to_add;
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
          }
          else
          {
              facilitated_plant.pop_back();
          }
     }
+<<<<<<< HEAD
     if(make_unfacilitated_plant==true && n_seeds_to_add>0)
+=======
+    if(make_unfacilitated_plant==true && n_unfacilitated_plants_to_add>0)
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
     {
          g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=white;
          unfacilitated_plant.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant)==true)
          {
+<<<<<<< HEAD
             --n_seeds_to_add;
+=======
+            --n_unfacilitated_plants_to_add;
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
          }
          else
          {
@@ -452,6 +480,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
   plant_coordinats &unfacilitated_plant
 )
 {
+<<<<<<< HEAD
 
     int n_seeds_to_add = ui->spinBox_init_n_seeds->value();
 
@@ -459,6 +488,16 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
 
     //Create as much facilitated and unfacilitated plants as needed
     while(n_seeds_to_add>0)
+=======
+    int n_facilitated_plants_to_add = ui->spinBox_init_n_f->value();
+    int n_unfacilitated_plants_to_add = ui->spinBox_init_n_uf->value();
+    assert(n_facilitated_plants_to_add >= 0);
+    assert(n_unfacilitated_plants_to_add >= 0);
+    plant_coordinats seeds;
+
+    //Create as much facilitated and unfacilitated plants as needed
+    while(n_facilitated_plants_to_add+n_unfacilitated_plants_to_add>0)
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
     {
       //Create a random seed
       const int x=rand() % g[0].size();
@@ -474,7 +513,12 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
         facilitated_plant,
         unfacilitated_plant,
         c,
+<<<<<<< HEAD
         n_seeds_to_add
+=======
+        n_facilitated_plants_to_add,
+        n_unfacilitated_plants_to_add
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
       );
     }
 
@@ -652,23 +696,33 @@ void MainWindow::ShowFitnessGraph()
       mFitnessSeriesUnfacilitated->append(xs[i], ufs[i]);
   }
   mFitnessChart->show();
+<<<<<<< HEAD
   int graph_width= mFitnessChart->size().width();
   std::cout<<graph_width;
   int left_thingy=66;
   //int graph_x=710;
   int position_line = left_thingy + (graph_width-left_thingy-40)* ui->box_trait_optimum->value();
 
+=======
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
 
   //Put the actual value line
   mActualValueLine->setGeometry(
     QRect(
+<<<<<<< HEAD
       position_line, //Dirty hack, should be improved
+=======
+      ui->box_trait_optimum->value() * 1000.0, //Dirty hack, should be improved
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
       80,
       3,
       300
      )
   );
+<<<<<<< HEAD
 
+=======
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
 }
 
 void MainWindow::ShowNumberOfSeedsGraph()
@@ -700,10 +754,18 @@ void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
 }
 void MainWindow::setPopulationSize(double value)
 {
+<<<<<<< HEAD
     if(ui->spinBox_init_n_seeds->value() != 0)
     {
         value = value * ui->spinBox_init_n_seeds->value();
     }
+=======
+    if(ui->spinBox_init_n_f->value() != 0)
+    {
+        value = value * ui->spinBox_init_n_f->value();
+    }
+    ui->spinBox_init_n_uf->setValue(value);
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
 }
 //button slots
 //-------------------
@@ -742,8 +804,11 @@ void MainWindow::on_proportionRatioUF_valueChanged(double arg1)
 void MainWindow::on_horizontalSlider_2_valueChanged(int value)
 {
     ui->spinBox_generation->setValue(value);
+<<<<<<< HEAD
     mGeneration = value;
 
+=======
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
 }
 //generation
 void MainWindow::on_spinBox_3_valueChanged(int arg1)
@@ -837,8 +902,14 @@ void MainWindow::on_pushButton_clicked()
     mGeneration=0;
     //mRngSeed=0;
     temperatureChange=0;
+<<<<<<< HEAD
     ui->spinBoxMutation->setValue(0);
     ui->spinBox_init_n_seeds->setValue(0);
+=======
+    ui->spinBox_init_n_f->setValue(0);
+    ui->spinBoxMutation->setValue(0);
+    ui->spinBox_init_n_uf->setValue(0);
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
     ui->spinBox_generation->setValue(0);
     ui->spinBox_n_nurse->setValue(0);
     ui->box_trait_optimum->setValue(0);
@@ -917,5 +988,8 @@ double normal(const double x, const double mean, const double sd) noexcept
 {
   return gauss(x - mean, sd);
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695

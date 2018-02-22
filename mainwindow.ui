@@ -56,17 +56,24 @@
           </item>
           <item row="1" column="1">
            <widget class="QSpinBox" name="spinBox_n_nurse">
+<<<<<<< HEAD
             <property name="maximumSize">
              <size>
               <width>120</width>
               <height>16777215</height>
              </size>
             </property>
+=======
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
             <property name="minimum">
              <number>1</number>
             </property>
             <property name="maximum">
+<<<<<<< HEAD
              <number>100</number>
+=======
+             <number>1000000000</number>
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
             </property>
             <property name="value">
              <number>10</number>
@@ -81,11 +88,16 @@
              </font>
             </property>
             <property name="text">
+<<<<<<< HEAD
              <string>Initial number of seeds</string>
+=======
+             <string>Initial number of facilitated plants</string>
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
             </property>
            </widget>
           </item>
           <item row="2" column="1">
+<<<<<<< HEAD
            <widget class="QSpinBox" name="spinBox_init_n_seeds">
             <property name="maximumSize">
              <size>
@@ -95,6 +107,11 @@
             </property>
             <property name="maximum">
              <number>500</number>
+=======
+           <widget class="QSpinBox" name="spinBox_init_n_f">
+            <property name="maximum">
+             <number>1000</number>
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
             </property>
             <property name="value">
              <number>1</number>
@@ -102,6 +119,31 @@
            </widget>
           </item>
           <item row="3" column="0">
+<<<<<<< HEAD
+=======
+           <widget class="QLabel" name="label_9">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>inital number of unfacilitated plants</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="spinBox_init_n_uf">
+            <property name="maximum">
+             <number>3600</number>
+            </property>
+            <property name="value">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
            <widget class="QLabel" name="label_11">
             <property name="font">
              <font>
@@ -113,6 +155,7 @@
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="3" column="1">
            <widget class="QSpinBox" name="spinBox_rng_seed">
             <property name="maximumSize">
@@ -121,6 +164,10 @@
               <height>16777215</height>
              </size>
             </property>
+=======
+          <item row="4" column="1">
+           <widget class="QSpinBox" name="spinBox_rng_seed">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
             <property name="maximum">
              <number>100000</number>
             </property>
@@ -232,9 +279,12 @@
           </item>
           <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="box_trait_optimum">
+<<<<<<< HEAD
             <property name="maximum">
              <double>1.000000000000000</double>
             </property>
+=======
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -302,21 +352,33 @@
           <string>Simulation</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
+<<<<<<< HEAD
           <item row="2" column="0">
+=======
+          <item row="3" column="0">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
            <widget class="QPushButton" name="pushButton_6">
             <property name="text">
              <string>Show Grid</string>
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="1" column="0">
+=======
+          <item row="2" column="0">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
            <widget class="QPushButton" name="pushButton_run">
             <property name="text">
              <string>Run</string>
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="1" column="1">
+=======
+          <item row="2" column="1">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
            <widget class="QPushButton" name="pushButton_5">
             <property name="text">
              <string>Explanation</string>
@@ -335,7 +397,11 @@
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="1" column="2">
+=======
+          <item row="2" column="2">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
            <widget class="QPushButton" name="pushButton">
             <property name="text">
              <string>Reset</string>
@@ -365,7 +431,24 @@
             </property>
            </widget>
           </item>
+<<<<<<< HEAD
           <item row="2" column="1" colspan="2">
+=======
+          <item row="1" column="0">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="3" column="1" colspan="2">
+>>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
            <widget class="QPushButton" name="pushButton_7">
             <property name="text">
              <string>Enlarge Graph</string>
