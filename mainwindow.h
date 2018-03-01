@@ -25,7 +25,7 @@ using yx_grid = std::vector<std::vector<QColor>>;
 using coordinat = std::pair<int,int>; //RJCB: renamed to 'coordinat', from erroneous 'coordinate'
 using plant_coordinats = std::vector<coordinat>; //RJCB: renamed to 'plant_coordinats', from erroneous 'plant_coordinates'
 using generations = std::vector<plant_coordinats>;
-
+using plant_values = std::vector<double>; //plant value is always between 0 and 1
 using namespace QtCharts;
 
 
@@ -140,6 +140,7 @@ public slots:
 
     QImage m_image;
     const QColor green = QColor(57,188,31);
+    green = QColor::darker(int factor = 200);
     const QColor brown = QColor(149,113,39);
     const QColor blue = QColor(56,119,182);
     //QColor usingColor = QColor(0,0,0); //RJCB: Only added state, without value
@@ -169,18 +170,26 @@ public slots:
                                           bool &make_unfacilitated_plant, bool &stop_unfaciliated, bool &stop_faciliated);
 
     void position_in_relation_to_plants(
-        yx_grid& g,
-        const plant_coordinats& nurse_plant_coordinats,
-        const plant_coordinats& seed_coordinats,
-        plant_coordinats &facilitated_plant,
-        plant_coordinats &unfacilitated_plant,
-        const coordinat& c,
-        int &n_seeds_to_add
+      yx_grid& g,
+      const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats
+      const plant_coordinats& seed_coordinats, //RJCB: Those were not seed, those were seed coordinats
+      plant_coordinats &facilitated_plant_coordinates,
+      plant_coordinats &unfacilitated_plant_coordinates,
+      const coordinat& c,
+      int &n_seeds_to_add,
+      plant_values &plant_trait_values
     );
+
     void set_plants(yx_grid& g);
-    void set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinats &nurse_plant, plant_coordinats &facilitated_plant, plant_coordinats &unfacilitated_plant);
-    bool distance_between_facilitated_plants(const plant_coordinats facilitated_plant);
-    bool distance_between_unfacilitated_plants(const plant_coordinats unfacilitated_plant);
+    void set_facilitated_and_unfacilitated_plants(
+      yx_grid& g,
+      plant_coordinats &nurse_plant,
+      plant_coordinats &facilitated_plant_coordinates,
+      plant_coordinats &unfacilitated_plant_coordinates,
+      plant_values &plant_trait_values
+    );
+    bool distance_between_facilitated_plants(const plant_coordinats facilitated_plant_coordinates);
+    bool distance_between_unfacilitated_plants(const plant_coordinats unfacilitated_plant_coordinates);
     void GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant);
     void save_generation(plant_coordinats &nurse_plant);
     void set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinats nurse_plant, int i);
