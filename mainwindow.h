@@ -175,12 +175,7 @@ public slots:
         plant_coordinats &facilitated_plant,
         plant_coordinats &unfacilitated_plant,
         const coordinat& c,
-<<<<<<< HEAD
         int &n_seeds_to_add
-=======
-        int &n_facilitated_plant,
-        int &n_unfacilitated_plant
->>>>>>> bbee3da8b5cd369e7bc9aa34158d814758a0e695
     );
     void set_plants(yx_grid& g);
     void set_facilitated_and_unfacilitated_plants(yx_grid& g, plant_coordinats &nurse_plant, plant_coordinats &facilitated_plant, plant_coordinats &unfacilitated_plant);
