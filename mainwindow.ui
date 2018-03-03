@@ -247,6 +247,59 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="groupBox_6">
+         <property name="title">
+          <string>Traits</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Initial traits</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>mean</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>std. dev</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QDoubleSpinBox" name="spinBox_traits_mean">
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.500000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QDoubleSpinBox" name="spinBox_traits_dev">
+            <property name="minimum">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>Biotic parameters</string>
@@ -436,7 +489,7 @@
      <x>0</x>
      <y>0</y>
      <width>1192</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

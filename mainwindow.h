@@ -135,9 +135,6 @@ public slots:
     //int mRngSeed; //RJCB: Just read from GUI
     float temperatureChange;
 
-    //grid
-    //std::vector<std::vector<int> > theGrid; //RJCB: You didn't use this one
-
     QImage m_image;
     //const QColor green = QColor(57,188,31);
     //green = QColor::darker(int factor = 200);

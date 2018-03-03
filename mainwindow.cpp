@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <vector>
 #include <iostream>
+#include <random>
 #include <QtCharts>
 #include <string>
 #include <QtGui>
@@ -102,6 +103,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
     QObject::connect(ui->spinBox_rng_seed, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
     QObject::connect(ui->spinBox_init_n_seeds, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_traits_mean, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
+    QObject::connect(ui->spinBox_traits_dev, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
     CreateGrid();
 
     QObject::connect(ui->box_fit_fac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
@@ -116,6 +119,20 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+///GetRandomNormal draws a random number from a normal distribution
+///with average mean and standard deviation of sigma.
+double GetRandomNormal(const double mean, const double sigma)
+{
+  //rd is used only to initialize mt with a truly random seed
+  static std::random_device rd;
+  //mt generates random numbers
+  static std::mt19937 mt(rd());
+  //d puts these random numbers in the correct distribution
+  std::normal_distribution<double> d(mean,sigma);
+  //The random value x gets drawn here
+  const double x{d(mt)};
+  return x;
 }
 
 void MainWindow::delay()
@@ -420,8 +437,7 @@ void MainWindow::position_in_relation_to_plants(
     }
     if(make_facilitated_plant==true && n_seeds_to_add>0)
     {
-         //Qcolor green = QColor::darker(plant_trait_values[plant_trait_values.size()-1]*100) const;
-         QColor green= QColor(0, plant_trait_values[plant_trait_values.size()-1]*255, 0);
+         QColor green= QColor(0, plant_trait_values[plant_trait_values.size()-1]*10+30, 0);
          g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= green;
          facilitated_plant_coordinates.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant_coordinates)==true)
@@ -435,7 +451,7 @@ void MainWindow::position_in_relation_to_plants(
     }
     if(make_unfacilitated_plant==true && n_seeds_to_add>0)
     {
-        QColor red= QColor(plant_trait_values[plant_trait_values.size()-1]*255,0, 0);
+        QColor red= QColor(plant_trait_values[plant_trait_values.size()-1]*190+20,0, 0);
          g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=red;
          unfacilitated_plant_coordinates.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant_coordinates)==true)
@@ -468,7 +484,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       const int y=rand() % g.size();
       const coordinat c(x,y);
       seeds.push_back(c);
-      plant_trait_values.push_back(static_cast<double>(rand()) / static_cast<double>(RAND_MAX));
+      plant_trait_values.push_back(GetRandomNormal(ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
       position_in_relation_to_plants(
