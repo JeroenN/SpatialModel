@@ -145,7 +145,7 @@ public slots:
     const QColor blue = QColor(56,119,182);
     //QColor usingColor = QColor(0,0,0); //RJCB: Only added state, without value
     const QColor white =  QColor(239,235,231);
-    const QColor red = QColor(255,0,0);
+    //const QColor red = QColor(255,0,0);
     int gridXStart;
     int gridXEnd;
     int gridYStart;

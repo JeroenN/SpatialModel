@@ -421,7 +421,8 @@ void MainWindow::position_in_relation_to_plants(
     if(make_facilitated_plant==true && n_seeds_to_add>0)
     {
          //Qcolor green = QColor::darker(plant_trait_values[plant_trait_values.size()-1]*100) const;
-         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= red;
+         QColor green= QColor(0, plant_trait_values[plant_trait_values.size()-1]*255, 0);
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= green;
          facilitated_plant_coordinates.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant_coordinates)==true)
          {
@@ -434,7 +435,8 @@ void MainWindow::position_in_relation_to_plants(
     }
     if(make_unfacilitated_plant==true && n_seeds_to_add>0)
     {
-         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=white;
+        QColor red= QColor(plant_trait_values[plant_trait_values.size()-1]*255,0, 0);
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=red;
          unfacilitated_plant_coordinates.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant_coordinates)==true)
          {
@@ -534,7 +536,7 @@ void MainWindow::new_generation(plant_coordinats seed_coordinate, plant_coordina
     for(unsigned i=0; i<seed_coordinate.size(); ++i)
     {
         nurse_plant.push_back(seed_coordinate[i]);
-        g[nurse_plant[i].second][nurse_plant[i].first]=red;
+        g[nurse_plant[i].second][nurse_plant[i].first]=white;
     }
 }
 
