@@ -420,8 +420,8 @@ void MainWindow::position_in_relation_to_plants(
     }
     if(make_facilitated_plant==true && n_seeds_to_add>0)
     {
-         Qcolor green = QColor::darker(plant_trait_values[plant_trait_values.size()-1]*100) const;
-         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= green;
+         //Qcolor green = QColor::darker(plant_trait_values[plant_trait_values.size()-1]*100) const;
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= red;
          facilitated_plant_coordinates.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant_coordinates)==true)
          {
@@ -657,15 +657,19 @@ void MainWindow::ShowFitnessGraph()
   }
   mFitnessChart->show();
   int graph_width= mFitnessChart->size().width();
-  std::cout<<graph_width;
-  int left_thingy=66;
-  //int graph_x=710;
-  int position_line = left_thingy + (graph_width-left_thingy-40)* ui->box_trait_optimum->value();
 
+  int left_chart_space=66;
+  int right_chart_space=44;
+
+  int position_line=422;
+  if(graph_width!=0)
+  {
+    position_line = left_chart_space + (graph_width-left_chart_space-right_chart_space)* ui->box_trait_optimum->value();
+  }
   //Put the actual value line
   mActualValueLine->setGeometry(
     QRect(
-      position_line, //Dirty hack, should be improved
+      position_line, //Dirty hach
       80,
       3,
       300

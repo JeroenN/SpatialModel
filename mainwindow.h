@@ -139,8 +139,8 @@ public slots:
     //std::vector<std::vector<int> > theGrid; //RJCB: You didn't use this one
 
     QImage m_image;
-    const QColor green = QColor(57,188,31);
-    green = QColor::darker(int factor = 200);
+    //const QColor green = QColor(57,188,31);
+    //green = QColor::darker(int factor = 200);
     const QColor brown = QColor(149,113,39);
     const QColor blue = QColor(56,119,182);
     //QColor usingColor = QColor(0,0,0); //RJCB: Only added state, without value
