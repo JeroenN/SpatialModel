@@ -27,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mFitnessChart(new QChart),
     mFitnessSeriesFacilitated(new QLineSeries),
     mFitnessSeriesUnfacilitated(new QLineSeries),
-    mNumberOfSeedsChart(new QChart)
+    mNumberOfSeedsChart(new QChart),
+    mCurrentTraitDistributionChart(new QChart)
 {
     ui->setupUi(this);
 
@@ -86,7 +87,26 @@ MainWindow::MainWindow(QWidget *parent) :
       //mFitnessSeriesFacilitated->setName("Facilitated");
       //mFitnessSeriesUnfacilitated->setName("Unfacilitated");
     }
-
+    //setup current trait distribution chart
+    {
+        mCurrentTraitDistributionView = new QChartView(mCurrentTraitDistributionChart);
+        mCurrentTraitDistributionView->setRenderHint(QPainter::Antialiasing);
+        ui->widget->layout()->addWidget(mCurrentTraitDistributionView);
+        mCurrentTraitDistributionChart->createDefaultAxes();
+        mCurrentTraitDistributionChart->setTitle("Current trait distribution");
+        QBarSeries *series = new QBarSeries();
+        CurrentTraitdistributionSets = new QBarSet("Traits");
+        *CurrentTraitdistributionSets << 16 << 30 <<22 << 56 << 22 << 21 << 30 << 12 << 12 << 78 << 70 << 30 <<22 << 56 << 22 << 21 << 30 << 12 << 12 << 78 << 21 << 0;
+        QStringList categories;
+        categories << "0.00" << "0.05" << "0.10" << "0.15" << "0.20" << "0.25" << "0.30" << "0.35" << "0.40" << "0.45" << "0.50" << "0.55" <<
+                      "0.60" << "0.65" << "0.70" << "0.75" << "0.80" << "0.85" << "0.90" << "0.95" << "1.00";
+        QBarCategoryAxis *axisX2 = new QBarCategoryAxis();
+        axisX2->append(categories);
+        axisX2->setRange(QString("0.00"), QString("1.00"));
+        mCurrentTraitDistributionChart->setAxisX(axisX2);
+        series->append(CurrentTraitdistributionSets);
+        mCurrentTraitDistributionChart->addSeries(series);
+    }
 
     //m_image = new QImage();
     //ui->pushButton_2->setHidden(true);
@@ -124,14 +144,10 @@ MainWindow::~MainWindow()
 ///with average mean and standard deviation of sigma.
 double GetRandomNormal(const double mean, const double sigma)
 {
-  //rd is used only to initialize mt with a truly random seed
-  static std::random_device rd;
-  //mt generates random numbers
-  static std::mt19937 mt(rd());
-  //d puts these random numbers in the correct distribution
-  std::normal_distribution<double> d(mean,sigma);
-  //The random value x gets drawn here
-  const double x{d(mt)};
+  double f= (double)rand() /RAND_MAX;
+  //randomX is a value between sigma and -sigma
+  double randomX = -sigma + f *(sigma*2); //fMin-fMax = sigma - - sigma = sigma + sigma = sigma*2
+  double x = mean +randomX;
   return x;
 }
 
@@ -485,6 +501,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       const coordinat c(x,y);
       seeds.push_back(c);
       plant_trait_values.push_back(GetRandomNormal(ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
+
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
       position_in_relation_to_plants(
@@ -687,7 +704,7 @@ void MainWindow::ShowFitnessGraph()
   //Put the actual value line
   mActualValueLine->setGeometry(
     QRect(
-      position_line, //Dirty hach
+      position_line, //Dirty hack
       80,
       3,
       300
@@ -716,6 +733,20 @@ void MainWindow::ShowNumberOfSeedsGraph()
   mNumberOfSeedsChart->show();
 }
 
+void MainWindow::ShowCurrentTraitDistributionGraph()
+{
+    mCurrentTraitDistributionChart->removeAllSeries();
+    QBarSeries *series = new QBarSeries();
+    CurrentTraitdistributionSets = new QBarSet("Traits");
+
+    *CurrentTraitdistributionSets << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0;
+    series->append(CurrentTraitdistributionSets);
+    mCurrentTraitDistributionChart->addSeries(series);
+    CurrentTraitdistributionSets->remove(0);
+    CurrentTraitdistributionSets->append(100);
+    mCurrentTraitDistributionChart->show();
+
+}
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
 {
      nurse_plants_seeds(nurse_plant, g);
@@ -877,6 +908,7 @@ void MainWindow::ShowGraphs()
 {
     ShowFitnessGraph();
     ShowNumberOfSeedsGraph();
+    ShowCurrentTraitDistributionGraph();
 }
 
 /*

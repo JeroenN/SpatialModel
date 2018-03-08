@@ -55,6 +55,7 @@ public slots:
     void ShowGraphs();
     void ShowFitnessGraph();
     void ShowNumberOfSeedsGraph();
+    void ShowCurrentTraitDistributionGraph();
     void CreateGrid();
     void RemoveGrid();
 
@@ -119,6 +120,41 @@ public slots:
     QChartView *mNumberOfSeedsChartView;
     QBarSet * mNumberOfSeedsFacilitatedSet;
     QBarSet * mNumberOfSeedsUnfacilitatedSet;
+
+    //more Chart current trait distribution
+    QChart *mCurrentTraitDistributionChart;
+    QChartView *mCurrentTraitDistributionView;
+    QBarSet *CurrentTraitdistributionSets;
+
+
+
+
+
+
+
+    /*
+    QBarSet *CurrentTraitDistributionSet00;
+    QBarSet *CurrentTraitDistributionSet005;
+    QBarSet *CurrentTraitDistributionSet01;
+    QBarSet *CurrentTraitDistributionSet015;
+    QBarSet *CurrentTraitDistributionSet02;
+    QBarSet *CurrentTraitDistributionSet025;
+    QBarSet *CurrentTraitDistributionSet03;
+    QBarSet *CurrentTraitDistributionSet035;
+    QBarSet *CurrentTraitDistributionSet04;
+    QBarSet *CurrentTraitDistributionSet045;
+    QBarSet *CurrentTraitDistributionSet05;
+    QBarSet *CurrentTraitDistributionSet055;
+    QBarSet *CurrentTraitDistributionSet060;
+    QBarSet *CurrentTraitDistributionSet065;
+    QBarSet *CurrentTraitDistributionSet07;
+    QBarSet *CurrentTraitDistributionSet075;
+    QBarSet *CurrentTraitDistributionSet08;
+    QBarSet *CurrentTraitDistributionSet085;
+    QBarSet *CurrentTraitDistributionSet09;
+    QBarSet *CurrentTraitDistributionSet095;
+    QBarSet *CurrentTraitDistributionSet10;
+    */
 
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;
