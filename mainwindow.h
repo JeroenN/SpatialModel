@@ -42,7 +42,6 @@ public:
     ~MainWindow();
 
 public slots:
-    void on_horizontalSlider_valueChanged(int value);
 
     void on_spinBoxMutation_valueChanged(double arg1);
 
@@ -56,6 +55,8 @@ public slots:
     void ShowFitnessGraph();
     void ShowNumberOfSeedsGraph();
     void ShowCurrentTraitDistributionGraph();
+    void calculate_curent_trait_distribution();
+
     void CreateGrid();
     void RemoveGrid();
 
@@ -125,36 +126,8 @@ public slots:
     QChart *mCurrentTraitDistributionChart;
     QChartView *mCurrentTraitDistributionView;
     QBarSet *CurrentTraitdistributionSets;
-
-
-
-
-
-
-
-    /*
-    QBarSet *CurrentTraitDistributionSet00;
-    QBarSet *CurrentTraitDistributionSet005;
-    QBarSet *CurrentTraitDistributionSet01;
-    QBarSet *CurrentTraitDistributionSet015;
-    QBarSet *CurrentTraitDistributionSet02;
-    QBarSet *CurrentTraitDistributionSet025;
-    QBarSet *CurrentTraitDistributionSet03;
-    QBarSet *CurrentTraitDistributionSet035;
-    QBarSet *CurrentTraitDistributionSet04;
-    QBarSet *CurrentTraitDistributionSet045;
-    QBarSet *CurrentTraitDistributionSet05;
-    QBarSet *CurrentTraitDistributionSet055;
-    QBarSet *CurrentTraitDistributionSet060;
-    QBarSet *CurrentTraitDistributionSet065;
-    QBarSet *CurrentTraitDistributionSet07;
-    QBarSet *CurrentTraitDistributionSet075;
-    QBarSet *CurrentTraitDistributionSet08;
-    QBarSet *CurrentTraitDistributionSet085;
-    QBarSet *CurrentTraitDistributionSet09;
-    QBarSet *CurrentTraitDistributionSet095;
-    QBarSet *CurrentTraitDistributionSet10;
-    */
+    std::vector<int> current_trait_distribution;
+    plant_values plant_trait_values;
 
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;

@@ -38,8 +38,7 @@ FORMS += \
     mainwindow.ui \
     explanation.ui
 
-DISTFILES += \
-    Grid.qml
+DISTFILES +=
 
 RESOURCES += \
     spatial-model.qrc

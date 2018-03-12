@@ -501,7 +501,6 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       const coordinat c(x,y);
       seeds.push_back(c);
       plant_trait_values.push_back(GetRandomNormal(ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
-
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
       position_in_relation_to_plants(
@@ -515,6 +514,8 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
         plant_trait_values
       );
     }
+    ShowCurrentTraitDistributionGraph();
+
 
 }
 void MainWindow::save_generation(plant_coordinats &nurse_plant)
@@ -621,7 +622,7 @@ void MainWindow::set_plants(yx_grid& g)
     plant_coordinats nurse_plant_coordinats;
     plant_coordinats facilitated_plant_coordinates;
     plant_coordinats unfacilitated_plant_coordinates;
-    plant_values plant_trait_values;
+    plant_trait_values.clear();
     add_nurse_plants(g, nurse_plant_coordinats);
     assert(static_cast<int>(nurse_plant_coordinats.size()) == ui->spinBox_n_nurse->value());
     set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
@@ -677,6 +678,7 @@ void MainWindow::ShowFitnessGraph()
   }
 
   mFitnessChart->show();
+  //ui->stackedWidget->addWidget(mFitnessChartView);
 
   mFitnessSeriesFacilitated->clear();
   //appends F plants
@@ -731,6 +733,32 @@ void MainWindow::ShowNumberOfSeedsGraph()
   mNumberOfSeedsUnfacilitatedSet->remove(0);
   mNumberOfSeedsUnfacilitatedSet->append(100.0 * fitness_unfacilitated);
   mNumberOfSeedsChart->show();
+  //ui->stackedWidget->addWidget(mNumberOfSeedsChartView);
+
+}
+void MainWindow::calculate_curent_trait_distribution()
+{
+    float trait_value = 0;
+    current_trait_distribution.clear();
+    for(int i = 0; i < 21; ++i)
+    {
+        int n_traits = 0;
+        for(unsigned j = 0; j < plant_trait_values.size()-1; ++j)
+        {
+            if(plant_trait_values[j]<=trait_value)
+            {
+                if(plant_trait_values[j]>=trait_value-0.05||plant_trait_values[j]<=0 || plant_trait_values[j] >= 1)
+                {
+                    n_traits++;
+                }
+            }
+        }
+        current_trait_distribution.push_back(n_traits);
+
+        trait_value += 0.05;
+    }
+    std::cout<<"last column:"<<current_trait_distribution[19]<<"\n";
+
 }
 
 void MainWindow::ShowCurrentTraitDistributionGraph()
@@ -738,14 +766,17 @@ void MainWindow::ShowCurrentTraitDistributionGraph()
     mCurrentTraitDistributionChart->removeAllSeries();
     QBarSeries *series = new QBarSeries();
     CurrentTraitdistributionSets = new QBarSet("Traits");
-
-    *CurrentTraitdistributionSets << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0 << 0;
+    calculate_curent_trait_distribution();
+    *CurrentTraitdistributionSets << current_trait_distribution[0] << current_trait_distribution[1] << current_trait_distribution[2] << current_trait_distribution[3] << current_trait_distribution[4] << current_trait_distribution[5] << current_trait_distribution[6] << current_trait_distribution[7]
+            << current_trait_distribution[8] << current_trait_distribution[9] << current_trait_distribution[10] << current_trait_distribution[11] << current_trait_distribution[12] << current_trait_distribution[13] << current_trait_distribution[14] << current_trait_distribution[15]
+            << current_trait_distribution[16] << current_trait_distribution[17] << current_trait_distribution[18] << current_trait_distribution[19] <<current_trait_distribution[20];
     series->append(CurrentTraitdistributionSets);
     mCurrentTraitDistributionChart->addSeries(series);
-    CurrentTraitdistributionSets->remove(0);
-    CurrentTraitdistributionSets->append(100);
+    //CurrentTraitdistributionSets->remove(0);
+    //CurrentTraitdistributionSets->append(100);
     mCurrentTraitDistributionChart->show();
-
+    std::cout<<current_trait_distribution[20]<<"\n";
+    //ui->stackedWidget->setWidget(mCurrentTraitDistributionView);
 }
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
 {
@@ -762,15 +793,10 @@ void MainWindow::setPopulationSize(double value)
 }
 //button slots
 //-------------------
-//muation rate slider
-void MainWindow::on_horizontalSlider_valueChanged(int value)
-{
-    ui->spinBoxMutation->setValue(value);
-}
+
 //mutation rate
 void MainWindow::on_spinBoxMutation_valueChanged(double arg1)
 {
-    ui->horizontalSlider->setValue(arg1);
     mutationRate = arg1;
 }
 //value changed F spinbox
@@ -891,7 +917,7 @@ void MainWindow::on_pushButton_clicked()
     mGeneration=0;
     //mRngSeed=0;
     temperatureChange=0;
-    ui->spinBoxMutation->setValue(0);
+    ui->spinBoxMutationMean->setValue(0);
     ui->spinBox_init_n_seeds->setValue(0);
     ui->spinBox_generation->setValue(0);
     ui->spinBox_n_nurse->setValue(0);
@@ -908,7 +934,7 @@ void MainWindow::ShowGraphs()
 {
     ShowFitnessGraph();
     ShowNumberOfSeedsGraph();
-    ShowCurrentTraitDistributionGraph();
+    //ShowCurrentTraitDistributionGraph();
 }
 
 /*
