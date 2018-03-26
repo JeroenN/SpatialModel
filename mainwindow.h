@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+#include <random>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 #include <QtCharts/QChartView>
@@ -25,7 +26,7 @@ using yx_grid = std::vector<std::vector<QColor>>;
 using coordinat = std::pair<int,int>; //RJCB: renamed to 'coordinat', from erroneous 'coordinate'
 using plant_coordinats = std::vector<coordinat>; //RJCB: renamed to 'plant_coordinats', from erroneous 'plant_coordinates'
 using generations = std::vector<plant_coordinats>;
-using plant_values = std::vector<double>; //plant value is always between 0 and 1
+using plant_values = std::vector<float>;
 using namespace QtCharts;
 
 
@@ -126,8 +127,9 @@ public slots:
     QChart *mCurrentTraitDistributionChart;
     QChartView *mCurrentTraitDistributionView;
     QBarSet *CurrentTraitdistributionSets;
-    std::vector<int> current_trait_distribution;
     plant_values plant_trait_values;
+    std::vector<int> current_trait_distribution;
+    int prev_plant_trait_size = 0;
 
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;
@@ -147,7 +149,7 @@ public slots:
     QImage m_image;
     //const QColor green = QColor(57,188,31);
     //green = QColor::darker(int factor = 200);
-    const QColor brown = QColor(149,113,39);
+    const QColor brown = QColor(0,0,0);
     const QColor blue = QColor(56,119,182);
     //QColor usingColor = QColor(0,0,0); //RJCB: Only added state, without value
     const QColor white =  QColor(239,235,231);
@@ -156,6 +158,7 @@ public slots:
     int gridXEnd;
     int gridYStart;
     int gridYEnd;
+    std::mt19937 m_rng_engine;
 
     ///The history of all plants
     generations generation_coordinates;

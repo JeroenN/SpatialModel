@@ -42,3 +42,38 @@ private:
 
 #endif // GRID_H
 */
+
+//current_trait_distribution.clear();
+/*if(current_trait_distribution.size>10)
+{
+    for(int i = 0; i < 21; ++i)
+    {
+        current_trait_distribution.push_back(0);
+        //int n_traits = 0;
+        for(unsigned j = 0; j < plant_trait_values.size()-1; ++j)
+        {
+            if(trait_value!=0 && trait_value!=1)
+            {
+                if(plant_trait_values[j]<=trait_value)
+                {
+                    if(plant_trait_values[j]>=trait_value-0.05)
+                    {
+                        n_traits++;
+                    }
+                }
+            }
+            else
+            {
+                if(plant_trait_values[j]<0)
+                {
+                    n_traits++;
+                }
+
+            }
+            if(trait_value==1)
+            {
+                if(plant_trait_values[j]>trait_value)
+                {
+                    n_traits++;
+                }
+            }*/

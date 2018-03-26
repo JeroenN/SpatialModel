@@ -142,12 +142,16 @@ MainWindow::~MainWindow()
 }
 ///GetRandomNormal draws a random number from a normal distribution
 ///with average mean and standard deviation of sigma.
-double GetRandomNormal(const double mean, const double sigma)
+double GetRandomNormal(std::mt19937& mt,const double mean, const double sigma)
 {
+ /*
   double f= (double)rand() /RAND_MAX;
   //randomX is a value between sigma and -sigma
   double randomX = -sigma + f *(sigma*2); //fMin-fMax = sigma - - sigma = sigma + sigma = sigma*2
   double x = mean +randomX;
+  */
+   std::normal_distribution<double> d(mean, sigma);
+   const double x{d(mt)};
   return x;
 }
 
@@ -489,6 +493,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
   plant_values &plant_trait_values
 )
 {
+    m_rng_engine = std::mt19937(ui->spinBox_rng_seed->value());
     int n_seeds_to_add = ui->spinBox_init_n_seeds->value();
     plant_coordinats seeds;
 
@@ -500,7 +505,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       const int y=rand() % g.size();
       const coordinat c(x,y);
       seeds.push_back(c);
-      plant_trait_values.push_back(GetRandomNormal(ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
+      plant_trait_values.push_back(GetRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
       position_in_relation_to_plants(
@@ -597,8 +602,6 @@ void MainWindow::nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g)
 
     }
 }
-
-
 
 void MainWindow::DrawGrid(const yx_grid& g)
 {
@@ -742,27 +745,62 @@ void MainWindow::calculate_curent_trait_distribution()
     current_trait_distribution.clear();
     for(int i = 0; i < 21; ++i)
     {
-        int n_traits = 0;
-        for(unsigned j = 0; j < plant_trait_values.size()-1; ++j)
+        current_trait_distribution.push_back(0);
+    }
+    for(int i = 0; i < 21; ++i)
+    {
+        for(unsigned j = 0; j < plant_trait_values.size(); ++j)
         {
-            if(plant_trait_values[j]<=trait_value)
+            if(trait_value!=0 && trait_value!=1)
             {
-                if(plant_trait_values[j]>=trait_value-0.05||plant_trait_values[j]<=0 || plant_trait_values[j] >= 1)
+                if(plant_trait_values[j]<=trait_value)
                 {
-                    n_traits++;
+                    if(plant_trait_values[j]>=trait_value-0.05)
+                    {
+                        current_trait_distribution[i] = current_trait_distribution[i] + 1;
+                    }
                 }
             }
-        }
-        current_trait_distribution.push_back(n_traits);
+            else
+            {
+                if(plant_trait_values[j]<0)
+                {
+                    current_trait_distribution[i] = current_trait_distribution[i] + 1;
+                }
 
-        trait_value += 0.05;
+            }
+            if(trait_value==1)
+            {
+                if(plant_trait_values[j]>trait_value)
+                {
+                    current_trait_distribution[i] = current_trait_distribution[i] + 1;
+                }
+            }
     }
+        trait_value += 0.05;
+
+}
+
+
+
     std::cout<<"last column:"<<current_trait_distribution[19]<<"\n";
 
 }
 
 void MainWindow::ShowCurrentTraitDistributionGraph()
 {
+
+    //if(current_trait_distribution.size() == 0 || ui->spinBox_init_n_seeds->value() < prev_plant_trait_size)
+    //{
+        /*current_trait_distribution.clear();
+        for(int i = 0; i < 21; ++i)
+        {
+            current_trait_distribution.push_back(0);
+        }*/
+    //}
+
+    prev_plant_trait_size = ui->spinBox_init_n_seeds->value();
+
     mCurrentTraitDistributionChart->removeAllSeries();
     QBarSeries *series = new QBarSeries();
     CurrentTraitdistributionSets = new QBarSet("Traits");
@@ -772,8 +810,6 @@ void MainWindow::ShowCurrentTraitDistributionGraph()
             << current_trait_distribution[16] << current_trait_distribution[17] << current_trait_distribution[18] << current_trait_distribution[19] <<current_trait_distribution[20];
     series->append(CurrentTraitdistributionSets);
     mCurrentTraitDistributionChart->addSeries(series);
-    //CurrentTraitdistributionSets->remove(0);
-    //CurrentTraitdistributionSets->append(100);
     mCurrentTraitDistributionChart->show();
     std::cout<<current_trait_distribution[20]<<"\n";
     //ui->stackedWidget->setWidget(mCurrentTraitDistributionView);
