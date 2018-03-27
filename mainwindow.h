@@ -207,7 +207,7 @@ public slots:
     void check_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinats &nurse_plant, int i, plant_coordinats seed_coordinate, yx_grid& g);
     void new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g);
     void nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g);
-
+    void set_plant_trait_next_gen( plant_values &plant_trait_values);
 
 
 

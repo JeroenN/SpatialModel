@@ -149,7 +149,7 @@ MainWindow::~MainWindow()
 }
 ///GetRandomNormal draws a random number from a normal distribution
 ///with average mean and standard deviation of sigma.
-double GetRandomNormal(std::mt19937& mt,const double mean, const double sigma)
+double getRandomNormal(std::mt19937& mt,const double mean, const double sigma)
 {
  /*
   double f= (double)rand() /RAND_MAX;
@@ -512,9 +512,10 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       const int y=rand() % g.size();
       const coordinat c(x,y);
       seeds.push_back(c);
-      plant_trait_values.push_back(GetRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
+      plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
+      set_plant_trait_next_gen(plant_trait_values);
       position_in_relation_to_plants(
         g,
         nurse_plant,
@@ -631,6 +632,12 @@ void MainWindow::DrawGrid(const yx_grid& g)
             SetPixel(i,j,g[i][j]);
         }
     }
+}
+void MainWindow::set_plant_trait_next_gen( plant_values &plant_trait_values)
+{
+    plant_values next_generation_plant_traits;
+    for(unsigned i=0; i<plant_trait_values.size(); ++i)
+    next_generation_plant_traits.push_back(getRandomNormal(m_rng_engine, 0,  ui->spinBox_mutation_stddev->value()));
 }
 
 void MainWindow::set_plants(yx_grid& g)
@@ -974,7 +981,6 @@ void MainWindow::on_pushButton_clicked()
     mGeneration=0;
     //mRngSeed=0;
     temperatureChange=0;
-    ui->spinBoxMutationMean->setValue(0);
     ui->spinBox_init_n_seeds->setValue(0);
     ui->spinBox_generation->setValue(0);
     ui->spinBox_n_nurse->setValue(0);
