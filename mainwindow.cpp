@@ -34,9 +34,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Setup all fitness chart-related things
     {
+
       mFitnessChartView = new QChartView(mFitnessChart);
       mFitnessChartView->setRenderHint(QPainter::Antialiasing);
       ui->widget->layout()->addWidget(mFitnessChartView);
+      mFitnessChartView->setHidden(true);
+
       mFitnessChart->createDefaultAxes();
       mFitnessChart->setTitle("How fitness depends on your neighbours");
       mFitnessChart->addSeries(mFitnessSeriesUnfacilitated);
@@ -63,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
       mNumberOfSeedsChartView = new QChartView(mNumberOfSeedsChart);
       mNumberOfSeedsChartView->setRenderHint(QPainter::Antialiasing);
       ui->widget->layout()->addWidget(mNumberOfSeedsChartView);
+      //mNumberOfSeedsChartView->setHidden(true);
+
       mNumberOfSeedsChart->createDefaultAxes();
       mNumberOfSeedsChart->setTitle("Number of seeds produced");
       mNumberOfSeedsFacilitatedSet = new QBarSet("Facilitated");
@@ -92,14 +97,16 @@ MainWindow::MainWindow(QWidget *parent) :
         mCurrentTraitDistributionView = new QChartView(mCurrentTraitDistributionChart);
         mCurrentTraitDistributionView->setRenderHint(QPainter::Antialiasing);
         ui->widget->layout()->addWidget(mCurrentTraitDistributionView);
+        //mCurrentTraitDistributionView->setHidden(true);
+
         mCurrentTraitDistributionChart->createDefaultAxes();
         mCurrentTraitDistributionChart->setTitle("Current trait distribution");
         QBarSeries *series = new QBarSeries();
         CurrentTraitdistributionSets = new QBarSet("Traits");
         *CurrentTraitdistributionSets << 16 << 30 <<22 << 56 << 22 << 21 << 30 << 12 << 12 << 78 << 70 << 30 <<22 << 56 << 22 << 21 << 30 << 12 << 12 << 78 << 21 << 0;
         QStringList categories;
-        categories << "0.00" << "0.05" << "0.10" << "0.15" << "0.20" << "0.25" << "0.30" << "0.35" << "0.40" << "0.45" << "0.50" << "0.55" <<
-                      "0.60" << "0.65" << "0.70" << "0.75" << "0.80" << "0.85" << "0.90" << "0.95" << "1.00";
+        categories << ".00" << ".05" << ".10" << ".15" << ".20" << ".25" << ".30" << ".35" << ".40" << ".45" << ".50" << ".55" <<
+                      ".60" << ".65" << ".70" << ".75" << ".80" << ".85" << ".90" << ".95" << "1.0";
         QBarCategoryAxis *axisX2 = new QBarCategoryAxis();
         axisX2->append(categories);
         axisX2->setRange(QString("0.00"), QString("1.00"));
@@ -396,7 +403,7 @@ bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinats un
 {
     int position_difference_x;
     int position_difference_y;
-    int n_unfacilitated_plant=unfacilitated_plant_coordinates.size();
+    n_unfacilitated_plant=unfacilitated_plant_coordinates.size();
 
     for(int i=0; i<n_unfacilitated_plant; ++i)
     {
@@ -520,7 +527,14 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       );
     }
     ShowCurrentTraitDistributionGraph();
+    float percentage_facilitated=100*((float)facilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
+    float percentage_unfacilitated=100*((float)unfacilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
+    std::cout<<"unfacilitated size"<< unfacilitated_plant_coordinates.size();
+    std::cout<<"facilitated size"<< facilitated_plant_coordinates.size();
+    //double percentage_unfacilitated=100.0/300.0;//  /n_seeds
 
+    std::cout<<"percentage unfacilitated: "<<percentage_unfacilitated<< "\n";
+    ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated);
 
 }
 void MainWindow::save_generation(plant_coordinats &nurse_plant)
@@ -549,7 +563,6 @@ void MainWindow::check_seed_nurse_plant_coordinates(
   yx_grid& g
  )
 {
-    std::cout<< "nurse plant first: "<<nurse_plant[i].first<<"\n";
     while(nurse_plant_x < 0 || nurse_plant_x > (static_cast<int>(g[0].size()) - 1)) //RJCB: must static_cast std::size_t to int
     {
         x = (rand() % 7) - 3;
@@ -717,7 +730,7 @@ void MainWindow::ShowFitnessGraph()
   );
 }
 
-void MainWindow::ShowNumberOfSeedsGraph()
+void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated)
 {
   //Dirty hack: just assume there are plants of all traits, from 0-1, both
   //facilitated and unfacilitated
@@ -731,11 +744,18 @@ void MainWindow::ShowNumberOfSeedsGraph()
     ui->box_fit_unfac_opt->value(),
     ui->box_fit_unfac_sd->value()
   );
+  int a = percentage_facilitated * fitness_facilitated;
+  int b = percentage_unfacilitated * fitness_unfacilitated;
+  if(a+b<100)
+  {
+
+  }
   mNumberOfSeedsFacilitatedSet->remove(0);
-  mNumberOfSeedsFacilitatedSet->append(100.0 * fitness_facilitated);
+  mNumberOfSeedsFacilitatedSet->append(percentage_facilitated* fitness_facilitated);
   mNumberOfSeedsUnfacilitatedSet->remove(0);
-  mNumberOfSeedsUnfacilitatedSet->append(100.0 * fitness_unfacilitated);
+  mNumberOfSeedsUnfacilitatedSet->append(percentage_unfacilitated* fitness_unfacilitated);
   mNumberOfSeedsChart->show();
+
   //ui->stackedWidget->addWidget(mNumberOfSeedsChartView);
 
 }
@@ -781,10 +801,6 @@ void MainWindow::calculate_curent_trait_distribution()
 
 }
 
-
-
-    std::cout<<"last column:"<<current_trait_distribution[19]<<"\n";
-
 }
 
 void MainWindow::ShowCurrentTraitDistributionGraph()
@@ -811,7 +827,6 @@ void MainWindow::ShowCurrentTraitDistributionGraph()
     series->append(CurrentTraitdistributionSets);
     mCurrentTraitDistributionChart->addSeries(series);
     mCurrentTraitDistributionChart->show();
-    std::cout<<current_trait_distribution[20]<<"\n";
     //ui->stackedWidget->setWidget(mCurrentTraitDistributionView);
 }
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
@@ -912,6 +927,9 @@ void MainWindow::on_pushButton_6_clicked()
     //ui->tableWidget->setHidden(false);
     ui->label_grid->setMinimumHeight(400);
     ui->label_grid->setMaximumHeight(400);
+    mFitnessChartView->setHidden(true);
+    //mNumberOfSeedsChartView->setHidden(true);
+    //mCurrentTraitDistributionView->setHidden(true);
     CreateGrid();
 
 }
@@ -923,6 +941,9 @@ void MainWindow::on_pushButton_7_clicked()
     //ui->tableWidget->setHidden(true);
     ui->label_grid->setMaximumHeight(0);
     ui->label_grid->setMinimumHeight(0);
+    mFitnessChartView->setHidden(false);
+    //mNumberOfSeedsChartView->setHidden(false);
+    //mCurrentTraitDistributionView->setHidden(false);
     RemoveGrid();
 }
 
@@ -969,7 +990,7 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::ShowGraphs()
 {
     ShowFitnessGraph();
-    ShowNumberOfSeedsGraph();
+    //ShowNumberOfSeedsGraph();
     //ShowCurrentTraitDistributionGraph();
 }
 

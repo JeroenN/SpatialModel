@@ -54,7 +54,7 @@ public slots:
 
     void ShowGraphs();
     void ShowFitnessGraph();
-    void ShowNumberOfSeedsGraph();
+    void ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated);
     void ShowCurrentTraitDistributionGraph();
     void calculate_curent_trait_distribution();
 
@@ -131,6 +131,8 @@ public slots:
     std::vector<int> current_trait_distribution;
     int prev_plant_trait_size = 0;
 
+    int n_facilitated_plant;
+    int n_unfacilitated_plant;
     QGraphicsScene *gridScene;
     QQuickWidget *gridWidget;
 
@@ -213,7 +215,6 @@ public slots:
 
     //void DrawGrid2(); //RJCB: Unused code should be deleted
 };
-
 yx_grid create_vector_grid(int n_rows, int n_columns, QColor color);
 
 /// Return a normal distribution (with mean zero and standard
