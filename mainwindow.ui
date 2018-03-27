@@ -33,28 +33,14 @@
           <string>Initialization</string>
          </property>
          <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Grid width and height</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_13">
-            <property name="text">
-             <string>[ADD]</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Number of nurse plants</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QSpinBox" name="spinBox_n_nurse">
             <property name="maximumSize">
              <size>
@@ -73,7 +59,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_6">
             <property name="font">
              <font>
@@ -85,7 +71,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QSpinBox" name="spinBox_init_n_seeds">
             <property name="maximumSize">
              <size>
@@ -104,7 +90,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_11">
             <property name="font">
              <font>
@@ -116,7 +102,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QSpinBox" name="spinBox_rng_seed">
             <property name="maximumSize">
              <size>
@@ -129,6 +115,20 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Grid height</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Grid width</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -138,20 +138,6 @@
           <string>Fitness optima</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Facilitatied</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Unfacilitated</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="2">
            <widget class="QDoubleSpinBox" name="box_fit_unfac_sd">
             <property name="minimum">
@@ -209,6 +195,20 @@
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>std. dev</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Facilitatied</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Unfacilitated</string>
             </property>
            </widget>
           </item>
@@ -457,7 +457,7 @@
        </sizepolicy>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_10">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -482,7 +482,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_grid">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -492,14 +492,14 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>800</width>
-           <height>400</height>
+           <width>500</width>
+           <height>500</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>800</width>
-           <height>400</height>
+           <width>500</width>
+           <height>600</height>
           </size>
          </property>
          <property name="text">

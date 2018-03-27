@@ -192,7 +192,7 @@ void MainWindow::SetPixel(const int x, const int y, const QColor color)
 {
   //RJCB: This '35 +' and '11 +' is completely weird,
   //  it is needed to draw the grid at the right spot somehow
-  m_image.setPixel(35 + x, 11 + y,color.rgb());
+  m_image.setPixel(30 + x, 5 + y,color.rgb());
   //m_image.setPixel(x, y,color.rgb());
 }
 
@@ -661,7 +661,7 @@ void MainWindow::CreateGrid()
 
     //RJCB: set seed here
     std::srand(ui->spinBox_rng_seed->value());
-    auto grid = create_vector_grid(60,50,brown);
+    auto grid = create_vector_grid(65,60,brown);
     set_plants(grid);
     DrawGrid(grid);
     this->update();
