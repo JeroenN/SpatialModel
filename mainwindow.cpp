@@ -138,8 +138,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->box_fit_fac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
     QObject::connect(ui->box_fit_unfac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
     QObject::connect(ui->box_fit_unfac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
-    QObject::connect(ui->box_trait_optimum, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
-
     ShowGraphs();
 }
 
@@ -464,7 +462,8 @@ void MainWindow::position_in_relation_to_plants(
     }
     if(make_facilitated_plant==true && n_seeds_to_add>0)
     {
-         QColor green= QColor(0, plant_trait_values[plant_trait_values.size()-1]*10+30, 0);
+          QColor green= QColor(0, plant_trait_values[plant_trait_values.size()-1]*10+30, 0);
+          facilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
          g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= green;
          facilitated_plant_coordinates.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant_coordinates)==true)
@@ -474,11 +473,13 @@ void MainWindow::position_in_relation_to_plants(
          else
          {
              facilitated_plant_coordinates.pop_back();
+             facilitated_plant_trait_value.pop_back();
          }
     }
     if(make_unfacilitated_plant==true && n_seeds_to_add>0)
     {
         QColor red= QColor(plant_trait_values[plant_trait_values.size()-1]*190+20,0, 0);
+        unfacilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
          g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=red;
          unfacilitated_plant_coordinates.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant_coordinates)==true)
@@ -488,6 +489,7 @@ void MainWindow::position_in_relation_to_plants(
          else
          {
             unfacilitated_plant_coordinates.pop_back();
+            unfacilitated_plant_trait_value.pop_back();
          }
     }
 }
@@ -528,14 +530,19 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       );
     }
     ShowCurrentTraitDistributionGraph();
+    float total_traits_facilitated=0;
+    for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
+    {
+        total_traits_facilitated+=facilitated_plant_trait_value[i];
+    }
+    float average_trait_value_facilitated=total_traits_facilitated/facilitated_plant_trait_value.size();
     float percentage_facilitated=100*((float)facilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
     float percentage_unfacilitated=100*((float)unfacilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
     std::cout<<"unfacilitated size"<< unfacilitated_plant_coordinates.size();
     std::cout<<"facilitated size"<< facilitated_plant_coordinates.size();
     //double percentage_unfacilitated=100.0/300.0;//  /n_seeds
-
     std::cout<<"percentage unfacilitated: "<<percentage_unfacilitated<< "\n";
-    ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated);
+    ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated, average_trait_value_facilitated);
 
 }
 void MainWindow::save_generation(plant_coordinats &nurse_plant)
@@ -716,7 +723,7 @@ void MainWindow::ShowFitnessGraph()
       mFitnessSeriesUnfacilitated->append(xs[i], ufs[i]);
   }
   mFitnessChart->show();
-  int graph_width= mFitnessChart->size().width();
+  /*int graph_width= mFitnessChart->size().width();
 
   int left_chart_space=66;
   int right_chart_space=44;
@@ -734,20 +741,21 @@ void MainWindow::ShowFitnessGraph()
       3,
       300
      )
-  );
+  );*/
 }
 
-void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated)
+void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated, float average_trait_value_facilitated)
 {
   //Dirty hack: just assume there are plants of all traits, from 0-1, both
   //facilitated and unfacilitated
   const double fitness_facilitated = normal(
-    ui->box_trait_optimum->value(),
+    average_trait_value_facilitated,//ui->box_trait_optimum->value(),
     ui->box_fit_fac_opt->value(),
     ui->box_fit_fac_sd->value()
   );
+  std::cout<<"average: "<<average_trait_value_facilitated << "/n";
   const double fitness_unfacilitated = normal(
-    ui->box_trait_optimum->value(),
+    0.50,//ui->box_trait_optimum->value(),
     ui->box_fit_unfac_opt->value(),
     ui->box_fit_unfac_sd->value()
   );
@@ -984,7 +992,7 @@ void MainWindow::on_pushButton_clicked()
     ui->spinBox_init_n_seeds->setValue(0);
     ui->spinBox_generation->setValue(0);
     ui->spinBox_n_nurse->setValue(0);
-    ui->box_trait_optimum->setValue(0);
+    //ui->box_trait_optimum->setValue(0);
     delay();
 }
 

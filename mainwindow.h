@@ -54,7 +54,7 @@ public slots:
 
     void ShowGraphs();
     void ShowFitnessGraph();
-    void ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated);
+    void ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated, float average_trait_value_facilitated);
     void ShowCurrentTraitDistributionGraph();
     void calculate_curent_trait_distribution();
 
@@ -147,7 +147,8 @@ public slots:
     int mGeneration = 0;
     //int mRngSeed; //RJCB: Just read from GUI
     float temperatureChange;
-
+    std::vector<float> facilitated_plant_trait_value;
+    std::vector<float> unfacilitated_plant_trait_value;
     QImage m_image;
     //const QColor green = QColor(57,188,31);
     //green = QColor::darker(int factor = 200);
