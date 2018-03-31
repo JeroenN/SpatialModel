@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mFitnessSeriesUnfacilitated(new QLineSeries),
     mNumberOfSeedsChart(new QChart),
     mCurrentTraitDistributionChart(new QChart),
-    m_seagrass_widget{new ribi::mb::QtMutualismBreakdownerSpatialWidget(100,100)}
+    m_seagrass_widget{new ribi::mb::QtMutualismBreakdownerSpatialWidget(10,10)}
 {
     ui->setupUi(this);
 
@@ -128,11 +128,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_6->setHidden(true);
     //ui->pushButton_7->setHidden(true);
 
-    //RJCB: Load from resources file, spatial-model.qrc
-    m_image.load(":/pics/Grid.png");
-
-    ui->label_grid->setPixmap(QPixmap::fromImage(m_image));
     ui->label_10->setHidden(true);
+
+    //Resolution grid grid
+    connect(ui->box_grid_height, SIGNAL(valueChanged(int)), this, SLOT(SetResolution()));
+    connect(ui->box_grid_width, SIGNAL(valueChanged(int)), this, SLOT(SetResolution()));
+    SetResolution();
 
     //Make all parameters involved in initialization trigger CreateGrid
     QObject::connect(ui->spinBox_n_nurse, SIGNAL(valueChanged(int)), this, SLOT(CreateGrid()));
@@ -176,8 +177,6 @@ void MainWindow::delay()
      {
         QCoreApplication::processEvents(QEventLoop::AllEvents , 100);
      }
-    ui->label_grid->setMinimumHeight(400);
-    ui->label_grid->setMaximumHeight(400);
     ui->label_10->setHidden(true);
 
     CreateGrid();
@@ -203,19 +202,15 @@ void MainWindow::SetPixel(const int x, const int y, const QColor color)
   this->m_seagrass_widget->SetPixel(x, y, color);
 }
 
-void MainWindow::SetResolution(const int width, const int height)
+void MainWindow::SetResolution()
 {
-  m_image = QImage(width,height,QImage::Format_RGB32);
+  m_seagrass_widget->SetResolution(
+    ui->box_grid_width->value(),
+    ui->box_grid_height->value()
+  );
+  CreateGrid();
 }
 
-void MainWindow::paintEvent(QPaintEvent *)
-{
-  QPainter painter(this);
-  painter.drawPixmap(
-    this->rect(),
-    QPixmap::fromImage(m_image)
-  );
-}
 /*void MainWindow::SetGridResolution()
 {
     QScreen *screen = QGuiApplication::primaryScreen();
@@ -677,7 +672,11 @@ void MainWindow::CreateGrid()
 
     //RJCB: set seed here
     std::srand(ui->spinBox_rng_seed->value());
-    auto grid = create_vector_grid(65,60,brown);
+    auto grid = create_vector_grid(
+      ui->box_grid_width->value(), // 65,
+      ui->box_grid_height->value(), //60,
+      brown
+    );
     set_plants(grid);
     DrawGrid(grid);
     this->update();
@@ -949,8 +948,6 @@ void MainWindow::on_pushButton_6_clicked()
     ui->pushButton_7->setHidden(false);
     ui->pushButton_6->setHidden(true);
     //ui->tableWidget->setHidden(false);
-    ui->label_grid->setMinimumHeight(400);
-    ui->label_grid->setMaximumHeight(400);
     mFitnessChartView->setHidden(true);
     //mNumberOfSeedsChartView->setHidden(true);
     //mCurrentTraitDistributionView->setHidden(true);
@@ -963,8 +960,6 @@ void MainWindow::on_pushButton_7_clicked()
     ui->pushButton_6->setHidden(false);
     ui->pushButton_7->setHidden(true);
     //ui->tableWidget->setHidden(true);
-    ui->label_grid->setMaximumHeight(0);
-    ui->label_grid->setMinimumHeight(0);
     mFitnessChartView->setHidden(false);
     //mNumberOfSeedsChartView->setHidden(false);
     //mCurrentTraitDistributionView->setHidden(false);
@@ -974,8 +969,6 @@ void MainWindow::on_pushButton_7_clicked()
 //run
 void MainWindow::on_pushButton_run_pressed()
 {
-    ui->label_grid->setMaximumHeight(0);
-    ui->label_grid->setMinimumHeight(0);
     ui->label_10->setHidden(false);
     RemoveGrid();
     generation_coordinates.clear();
@@ -984,8 +977,6 @@ void MainWindow::on_pushButton_run_pressed()
 //run
 void MainWindow::on_pushButton_run_released()
 {
-    ui->label_grid->setMinimumHeight(400);
-    ui->label_grid->setMaximumHeight(400);
     ui->label_10->setHidden(true);
     CreateGrid();
 }

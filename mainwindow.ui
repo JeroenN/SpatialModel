@@ -138,7 +138,7 @@
              <number>10000</number>
             </property>
             <property name="value">
-             <number>100</number>
+             <number>65</number>
             </property>
            </widget>
           </item>
@@ -151,7 +151,7 @@
              <number>10000</number>
             </property>
             <property name="value">
-             <number>100</number>
+             <number>60</number>
             </property>
            </widget>
           </item>
@@ -448,7 +448,7 @@
        </sizepolicy>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_10">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -466,31 +466,6 @@
           <size>
            <width>800</width>
            <height>300</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_grid">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>500</width>
-           <height>500</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>500</width>
-           <height>600</height>
           </size>
          </property>
          <property name="text">

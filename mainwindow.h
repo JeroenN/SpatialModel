@@ -73,8 +73,8 @@ public slots:
     //void CheckColorGrid(int x, int y, QColor color);
     void SetPixel(const int x, const int y, const QColor color);
 
-    void SetResolution(const int width, const int height);
-    void paintEvent(QPaintEvent *);
+    ///Set the number of pixels of the grid
+    void SetResolution();
 
     void on_proportionRatioUF_valueChanged(double arg1);
     void setPopulationSize(double value);
@@ -154,7 +154,6 @@ public slots:
     float temperatureChange;
     std::vector<float> facilitated_plant_trait_value;
     std::vector<float> unfacilitated_plant_trait_value;
-    QImage m_image;
     //const QColor green = QColor(57,188,31);
     //green = QColor::darker(int factor = 200);
     const QColor brown = QColor(0,0,0);
