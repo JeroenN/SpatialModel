@@ -13,7 +13,7 @@
 #include <cassert>
 using namespace QtCharts;
 #include <QtQuick/QtQuick>
-
+#include "qtmutualismbreakdownerspatialwidget.h"
 
 //grid
 #include <QImage>
@@ -28,7 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
     mFitnessSeriesFacilitated(new QLineSeries),
     mFitnessSeriesUnfacilitated(new QLineSeries),
     mNumberOfSeedsChart(new QChart),
-    mCurrentTraitDistributionChart(new QChart)
+    mCurrentTraitDistributionChart(new QChart),
+    m_seagrass_widget{new ribi::mb::QtMutualismBreakdownerSpatialWidget(10,10)}
 {
     ui->setupUi(this);
 
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
       mFitnessChartView = new QChartView(mFitnessChart);
       mFitnessChartView->setRenderHint(QPainter::Antialiasing);
-      ui->widget->layout()->addWidget(mFitnessChartView);
+      ui->results_widget->layout()->addWidget(mFitnessChartView);
       mFitnessChartView->setHidden(true);
 
       mFitnessChart->createDefaultAxes();
@@ -61,11 +62,18 @@ MainWindow::MainWindow(QWidget *parent) :
       mActualValueLine->setFrameShape(QFrame::VLine);
       mActualValueLine->setFrameShadow(QFrame::Sunken);
     }
-    //Setup all fitness chart-related things
+    //Grid
+    {
+      const auto my_layout = ui->results_widget->layout();
+      assert(my_layout);
+      my_layout->addWidget(m_seagrass_widget);
+      m_seagrass_widget->setMinimumSize(100,100);
+    }
+    //Charts
     {
       mNumberOfSeedsChartView = new QChartView(mNumberOfSeedsChart);
       mNumberOfSeedsChartView->setRenderHint(QPainter::Antialiasing);
-      ui->widget->layout()->addWidget(mNumberOfSeedsChartView);
+      ui->results_widget->layout()->addWidget(mNumberOfSeedsChartView);
       //mNumberOfSeedsChartView->setHidden(true);
 
       mNumberOfSeedsChart->createDefaultAxes();
@@ -96,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         mCurrentTraitDistributionView = new QChartView(mCurrentTraitDistributionChart);
         mCurrentTraitDistributionView->setRenderHint(QPainter::Antialiasing);
-        ui->widget->layout()->addWidget(mCurrentTraitDistributionView);
+        ui->results_widget->layout()->addWidget(mCurrentTraitDistributionView);
         //mCurrentTraitDistributionView->setHidden(true);
 
         mCurrentTraitDistributionChart->createDefaultAxes();

@@ -29,9 +29,14 @@ using generations = std::vector<plant_coordinats>;
 using plant_values = std::vector<float>;
 using namespace QtCharts;
 
-
+///Forward declarations
+namespace ribi {
+  namespace mb {
+    struct QtMutualismBreakdownerSpatialWidget;
+  }
+}
 namespace Ui {
-class MainWindow;
+  class MainWindow;
 }
 
  class MainWindow : public QMainWindow
@@ -166,11 +171,9 @@ public slots:
     ///The history of all plants
     generations generation_coordinates;
 
-    //yx_grid g; //RJCB: Unused, so removed
-
-    ///Clear the GUI grid
-    /// Note: only using g for size :-(
-    //void ClearGrid(const yx_grid& g);
+    ///The grid. I call is m_seagrass_widget, as I won't cleanup your
+    ///variables: if you want a mess, I keep it as such
+    ribi::mb::QtMutualismBreakdownerSpatialWidget * const m_seagrass_widget;
 
     void DrawGrid(const yx_grid& g);
 
