@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mFitnessSeriesUnfacilitated(new QLineSeries),
     mNumberOfSeedsChart(new QChart),
     mCurrentTraitDistributionChart(new QChart),
-    m_seagrass_widget{new ribi::mb::QtMutualismBreakdownerSpatialWidget(10,10)}
+    m_seagrass_widget{new ribi::mb::QtMutualismBreakdownerSpatialWidget(100,100)}
 {
     ui->setupUi(this);
 
@@ -198,8 +198,9 @@ void MainWindow::SetPixel(const int x, const int y, const QColor color)
 {
   //RJCB: This '35 +' and '11 +' is completely weird,
   //  it is needed to draw the grid at the right spot somehow
-  m_image.setPixel(30 + x, 5 + y,color.rgb());
+  //m_image.setPixel(30 + x, 5 + y,color.rgb());
   //m_image.setPixel(x, y,color.rgb());
+  this->m_seagrass_widget->SetPixel(x, y, color);
 }
 
 void MainWindow::SetResolution(const int width, const int height)
