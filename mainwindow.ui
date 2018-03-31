@@ -129,6 +129,32 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="box_grid_width">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+            <property name="value">
+             <number>65</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="box_grid_height">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>10000</number>
+            </property>
+            <property name="value">
+             <number>60</number>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -414,65 +440,23 @@
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="widget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOn</enum>
       </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>800</width>
-           <height>300</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>800</width>
-           <height>300</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_grid">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>500</width>
-           <height>500</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>500</width>
-           <height>600</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="results">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>820</width>
+         <height>822</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -483,7 +467,7 @@
      <x>0</x>
      <y>0</y>
      <width>1192</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

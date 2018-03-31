@@ -27,16 +27,19 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     explanation.cpp \
-    grid.cpp
+    grid.cpp \
+    qtmutualismbreakdownerspatialwidget.cpp
 
 HEADERS += \
     mainwindow.h \
     explanation.h \
-    grid.h
+    grid.h \
+    qtmutualismbreakdownerspatialwidget.h
 
 FORMS += \
     mainwindow.ui \
-    explanation.ui
+    explanation.ui \
+    qtmutualismbreakdownerspatialwidget.ui
 
 DISTFILES +=
 

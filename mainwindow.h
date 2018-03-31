@@ -29,9 +29,14 @@ using generations = std::vector<plant_coordinats>;
 using plant_values = std::vector<float>;
 using namespace QtCharts;
 
-
+///Forward declarations
+namespace ribi {
+  namespace mb {
+    struct QtMutualismBreakdownerSpatialWidget;
+  }
+}
 namespace Ui {
-class MainWindow;
+  class MainWindow;
 }
 
  class MainWindow : public QMainWindow
@@ -68,8 +73,8 @@ public slots:
     //void CheckColorGrid(int x, int y, QColor color);
     void SetPixel(const int x, const int y, const QColor color);
 
-    void SetResolution(const int width, const int height);
-    void paintEvent(QPaintEvent *);
+    ///Set the number of pixels of the grid
+    void SetResolution();
 
     void on_proportionRatioUF_valueChanged(double arg1);
     void setPopulationSize(double value);
@@ -149,7 +154,6 @@ public slots:
     float temperatureChange;
     std::vector<float> facilitated_plant_trait_value;
     std::vector<float> unfacilitated_plant_trait_value;
-    QImage m_image;
     //const QColor green = QColor(57,188,31);
     //green = QColor::darker(int factor = 200);
     const QColor brown = QColor(0,0,0);
@@ -166,11 +170,9 @@ public slots:
     ///The history of all plants
     generations generation_coordinates;
 
-    //yx_grid g; //RJCB: Unused, so removed
-
-    ///Clear the GUI grid
-    /// Note: only using g for size :-(
-    //void ClearGrid(const yx_grid& g);
+    ///The grid. I call is m_seagrass_widget, as I won't cleanup your
+    ///variables: if you want a mess, I keep it as such
+    ribi::mb::QtMutualismBreakdownerSpatialWidget * const m_seagrass_widget;
 
     void DrawGrid(const yx_grid& g);
 
