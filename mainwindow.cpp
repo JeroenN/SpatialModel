@@ -511,6 +511,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
     plant_coordinats seeds;
 
     //Create as much facilitated and unfacilitated plants as needed
+
     while(n_seeds_to_add>0)
     {
       //Create a random seed
@@ -522,6 +523,8 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       //Determine what this seed will add up to:
       //the number of facilitated of unfacilitated plants?
       set_plant_trait_next_gen(plant_trait_values);
+
+
       position_in_relation_to_plants(
         g,
         nurse_plant,
@@ -533,12 +536,20 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
         plant_trait_values
       );
     }
-    ShowCurrentTraitDistributionGraph();
     float total_traits_facilitated=0;
     for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
     {
         total_traits_facilitated+=facilitated_plant_trait_value[i];
+
+        const double fitness_facilitated = normal(
+          facilitated_plant_trait_value[i],//ui->box_trait_optimum->value(),
+          ui->box_fit_fac_opt->value(),
+          ui->box_fit_fac_sd->value()
+        );
+        facilitated_plant_fitness_value.push_back(fitness_facilitated);
     }
+    set_traits_next_gen(m_rng_engine, total_traits_facilitated);
+    ShowCurrentTraitDistributionGraph();
     float average_trait_value_facilitated=total_traits_facilitated/facilitated_plant_trait_value.size();
     float percentage_facilitated=100*((float)facilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
     float percentage_unfacilitated=100*((float)unfacilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
@@ -549,6 +560,44 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
     ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated, average_trait_value_facilitated);
 
 }
+void MainWindow::set_fitness_facilitated()
+{
+    for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
+    {
+        const double fitness_facilitated = normal(
+          facilitated_plant_trait_value[i],//ui->box_trait_optimum->value(),
+          ui->box_fit_fac_opt->value(),
+          ui->box_fit_fac_sd->value()
+        );
+        facilitated_plant_fitness_value.push_back(fitness_facilitated);
+    }
+}
+
+void MainWindow::set_fitness_unfacilitated()
+{
+    for(unsigned i=0; i<unfacilitated_plant_trait_value.size(); ++i)
+    {
+        const double fitness_unfacilitated = normal(
+          unfacilitated_plant_trait_value[i],//ui->box_trait_optimum->value(),
+          ui->box_fit_fac_opt->value(),
+          ui->box_fit_fac_sd->value()
+        );
+        unfacilitated_plant_fitness_value.push_back(fitness_unfacilitated);
+    }
+}
+void MainWindow::set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated)
+{
+       set_fitness_facilitated();
+       std::discrete_distribution<int> dist(facilitated_plant_fitness_value.begin(), facilitated_plant_fitness_value.end());
+
+         for (int i=0; i!=ui->spinBox_init_n_seeds->value(); ++i)
+         {
+           std::cout << dist(mt) << ' ';
+         }
+         std::cout<<"\n";
+         facilitated_plant_fitness_value.clear();
+}
+
 void MainWindow::save_generation(plant_coordinats &nurse_plant)
 {
     for(int i=0; i<mGeneration; ++i)
@@ -667,11 +716,7 @@ void MainWindow::set_plants(yx_grid& g)
 }
 void MainWindow::CreateGrid()
 {
-    //usingColor = blue;
-    //SetGridResolution();
-
-    //RJCB: set seed here
-    std::srand(ui->spinBox_rng_seed->value());
+    std::srand(ui->spinBox_rng_seed->value()); //set Seed
     auto grid = create_vector_grid(
       ui->box_grid_width->value(), // 65,
       ui->box_grid_height->value(), //60,
@@ -679,6 +724,7 @@ void MainWindow::CreateGrid()
     );
     set_plants(grid);
     DrawGrid(grid);
+
     m_seagrass_widget->update();
     this->update();
 }
@@ -767,12 +813,7 @@ void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percenta
     ui->box_fit_unfac_opt->value(),
     ui->box_fit_unfac_sd->value()
   );
-  int a = percentage_facilitated * fitness_facilitated;
-  int b = percentage_unfacilitated * fitness_unfacilitated;
-  if(a+b<100)
-  {
 
-  }
   mNumberOfSeedsFacilitatedSet->remove(0);
   mNumberOfSeedsFacilitatedSet->append(percentage_facilitated* fitness_facilitated);
   mNumberOfSeedsUnfacilitatedSet->remove(0);

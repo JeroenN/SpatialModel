@@ -34,6 +34,7 @@ void ribi::mb::QtMutualismBreakdownerSpatialWidget::SetResolution(const int widt
   m_image = QImage(width,height,QImage::Format_RGB32);
 }
 
+
 void ribi::mb::QtMutualismBreakdownerSpatialWidget::paintEvent(QPaintEvent *)
 {
   QPainter painter(this);

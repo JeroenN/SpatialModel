@@ -165,6 +165,9 @@ public slots:
     int gridXEnd;
     int gridYStart;
     int gridYEnd;
+    std::vector<double>facilitated_plant_fitness_value;
+    std::vector<double>unfacilitated_plant_fitness_value;
+    void set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated);
     std::mt19937 m_rng_engine;
 
     ///The history of all plants
@@ -211,7 +214,8 @@ public slots:
     void new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g);
     void nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g);
     void set_plant_trait_next_gen( plant_values &plant_trait_values);
-
+    void set_fitness_facilitated();
+    void set_fitness_unfacilitated();
 
 
     //void set_seed(); //RJCB: Too simple to keep in
