@@ -59,7 +59,7 @@ public slots:
 
     void ShowGraphs();
     void ShowFitnessGraph();
-    void ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated, float average_trait_value_facilitated);
+    void ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated, float average_trait_value_facilitated, float average_trait_value_unfacilitated);
     void ShowCurrentTraitDistributionGraph();
     void calculate_curent_trait_distribution();
 
@@ -169,7 +169,8 @@ public slots:
     std::vector<double>unfacilitated_plant_fitness_value;
     void set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated);
     std::mt19937 m_rng_engine;
-
+    int nFacilitated_plants_produced;
+    int nUnfacilitated_plants_produced;
     ///The history of all plants
     generations generation_coordinates;
 
