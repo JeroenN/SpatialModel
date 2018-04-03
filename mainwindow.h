@@ -79,9 +79,9 @@ public slots:
     void on_proportionRatioUF_valueChanged(double arg1);
     void setPopulationSize(double value);
 
-    void on_horizontalSlider_2_valueChanged(int value);
+    void on_slider_generation_valueChanged(int value);
 
-    void on_spinBox_3_valueChanged(int arg1);
+    void on_spinBox_generation_valueChanged(int arg1);
 
     void on_pushButton_5_clicked();
 
@@ -156,7 +156,7 @@ public slots:
     std::vector<float> unfacilitated_plant_trait_value;
     //const QColor green = QColor(57,188,31);
     //green = QColor::darker(int factor = 200);
-    const QColor brown = QColor(0,0,0);
+    const QColor black = QColor(0,0,0);
     const QColor blue = QColor(56,119,182);
     //QColor usingColor = QColor(0,0,0); //RJCB: Only added state, without value
     const QColor white =  QColor(239,235,231);
@@ -208,16 +208,18 @@ public slots:
     );
     bool distance_between_facilitated_plants(const plant_coordinats facilitated_plant_coordinates);
     bool distance_between_unfacilitated_plants(const plant_coordinats unfacilitated_plant_coordinates);
-    void GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant);
-    void save_generation(plant_coordinats &nurse_plant);
+    void GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant, plant_coordinats &facilitated_plant_coordinates);
     void set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinats nurse_plant, int i);
     void check_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinats &nurse_plant, int i, plant_coordinats seed_coordinate, yx_grid& g);
-    void new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g);
+    void new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g, const int generation_cycle);
     void nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g);
     void set_plant_trait_next_gen( plant_values &plant_trait_values);
+    int  new_position_facilitated(plant_coordinats &facilitated_plant_coordinates);
+    void create_new_facilitated_plants(plant_coordinats &facilitated_plant_coordinates, yx_grid& g);
     void set_fitness_facilitated();
     void set_fitness_unfacilitated();
     void clear_fitness_trait_vectors();
+    void ClearGrid(const yx_grid& g);
 
 
     //void set_seed(); //RJCB: Too simple to keep in

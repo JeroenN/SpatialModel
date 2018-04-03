@@ -87,7 +87,8 @@ MainWindow::MainWindow(QWidget *parent) :
       mNumberOfSeedsChart->setTitle("Number of seeds produced");
       mNumberOfSeedsFacilitatedSet = new QBarSet("Facilitated");
       mNumberOfSeedsUnfacilitatedSet = new QBarSet("Unfacilitated");
-      *mNumberOfSeedsFacilitatedSet << 100;
+      std::cout<<" total plants 1:  " <<ui->spinBox_init_n_seeds->value() << "\n";
+      *mNumberOfSeedsFacilitatedSet << 100; //ui->spinBox_init_n_seeds->value() doesnt seem to work here, dont know why...
       *mNumberOfSeedsUnfacilitatedSet << 100;
       QBarSeries *series = new QBarSeries();
       series->append(mNumberOfSeedsUnfacilitatedSet);
@@ -153,6 +154,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->box_fit_fac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
     QObject::connect(ui->box_fit_unfac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
     QObject::connect(ui->box_fit_unfac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
+    QObject::connect(ui->spinBox_init_n_seeds, SIGNAL(valueChanged(int)), this, SLOT(ShowGraphs()));
     ShowGraphs();
 }
 
@@ -627,13 +629,7 @@ void MainWindow::clear_fitness_trait_vectors()
     facilitated_plant_trait_value.clear();
 }
 
-void MainWindow::save_generation(plant_coordinats &nurse_plant)
-{
-    for(int i=0; i<mGeneration; ++i)
-    {
-        generation_coordinates.push_back(nurse_plant);
-    }
-}
+
 void MainWindow::set_seed_nurse_plant_coordinates(int x, int y, int &nurse_plant_x, int &nurse_plant_y, plant_coordinats nurse_plant, int i)
 {
     nurse_plant_y = nurse_plant[i].second;
@@ -673,35 +669,39 @@ void MainWindow::check_seed_nurse_plant_coordinates(
     assert(nurse_plant_x<g[0].size());
     */
 }
-void MainWindow::new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g)
+void MainWindow::new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g, const int generation_cycle)
 {
-    for(unsigned i=0; i<seed_coordinate.size(); ++i)
+    ClearGrid(g);
+    for(unsigned j=0; j<seed_coordinate.size(); ++j)
     {
-        nurse_plant.push_back(seed_coordinate[i]);
-        g[nurse_plant[i].second][nurse_plant[i].first]=white;
+
+        nurse_plant.push_back(seed_coordinate[j]);
+        if(mGeneration-1==generation_cycle)
+        {
+            g[nurse_plant[j].second][nurse_plant[j].first]=blue;
+        }
     }
 }
 
 void MainWindow::nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g)
 {
-    save_generation(nurse_plant);
     for(int i=0; i<mGeneration; ++i)
     {
-    plant_coordinats seed_coordinate;
-    coordinat c=coordinat(0,0);
-    for(unsigned i=0; i<nurse_plant.size(); ++i)
-    {
-        int x = (rand() % 7) - 3;
-        int y = (rand() % 7) - 3;
-        int nurse_plant_x=0;
-        int nurse_plant_y=0;
-        set_seed_nurse_plant_coordinates(x,y,nurse_plant_x,nurse_plant_y,nurse_plant, i);
-        check_seed_nurse_plant_coordinates(x,y, nurse_plant_x, nurse_plant_y, nurse_plant, i, seed_coordinate, g);
-        c=coordinat(nurse_plant_x,nurse_plant_y);
-        seed_coordinate.push_back(c);
-    }
-    nurse_plant.clear();
-    new_generation(seed_coordinate, nurse_plant, g);
+        plant_coordinats seed_coordinate;
+        coordinat c=coordinat(0,0);
+        for(unsigned i=0; i<nurse_plant.size(); ++i)
+        {
+            int x = (rand() % 7) - 3;
+            int y = (rand() % 7) - 3;
+            int nurse_plant_x=0;
+            int nurse_plant_y=0;
+            set_seed_nurse_plant_coordinates(x,y,nurse_plant_x,nurse_plant_y,nurse_plant, i);
+            check_seed_nurse_plant_coordinates(x,y, nurse_plant_x, nurse_plant_y, nurse_plant, i, seed_coordinate, g);
+            c=coordinat(nurse_plant_x,nurse_plant_y);
+            seed_coordinate.push_back(c);
+        }
+        nurse_plant.clear();
+        new_generation(seed_coordinate, nurse_plant, g, i);
 
     }
 }
@@ -740,7 +740,7 @@ void MainWindow::set_plants(yx_grid& g)
     set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
     if(ui->spinBox_generation->value() > 0)
     {
-        GenerateGeneration(g, nurse_plant_coordinats);
+        GenerateGeneration(g, nurse_plant_coordinats, facilitated_plant_coordinates);
     }
 }
 void MainWindow::CreateGrid()
@@ -749,7 +749,7 @@ void MainWindow::CreateGrid()
     auto grid = create_vector_grid(
       ui->box_grid_width->value(), // 65,
       ui->box_grid_height->value(), //60,
-      brown
+      black
     );
     set_plants(grid);
     DrawGrid(grid);
@@ -829,30 +829,6 @@ void MainWindow::ShowFitnessGraph()
 
 void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated, float average_trait_value_facilitated, float average_trait_value_unfacilitated)
 {
-  //Dirty hack: just assume there are plants of all traits, from 0-1, both
-  //facilitated and unfacilitated
-    const double fitness_facilitated = normal(
-      average_trait_value_facilitated,//ui->box_trait_optimum->value(),
-      ui->box_fit_fac_opt->value(),
-      ui->box_fit_fac_sd->value()
-    );
-
-    const double fitness_unfacilitated = normal(
-      average_trait_value_unfacilitated,//ui->box_trait_optimum->value(),
-      ui->box_fit_unfac_opt->value(),
-      ui->box_fit_unfac_sd->value()
-    );
-  float fitness_environmental_situation_facilitated = fitness_facilitated*percentage_facilitated;
-  float fitness_environmental_situation_unfacilitated = fitness_unfacilitated*percentage_unfacilitated;
-  float relative_fitness_facilitated_plants = fitness_environmental_situation_facilitated/(fitness_environmental_situation_facilitated+fitness_environmental_situation_unfacilitated);
-  float relative_fitness_unfacilitated_plants = fitness_environmental_situation_unfacilitated/(fitness_environmental_situation_facilitated+fitness_environmental_situation_unfacilitated);
-
-  float facilitated_plants_produced= relative_fitness_facilitated_plants*percentage_facilitated;
-  float unfacilitated_plants_produced= relative_fitness_unfacilitated_plants*percentage_unfacilitated;
-
-  std::cout<<"unfacilitated plants: " << nUnfacilitated_plants_produced << "\n";
-  std::cout<<"facilitated plants: " << nFacilitated_plants_produced << "\n";
-  std::cout<<"total plants: " << ui->spinBox_init_n_seeds->value() << "\n";
   mNumberOfSeedsFacilitatedSet->remove(0);
   mNumberOfSeedsFacilitatedSet->append(nFacilitated_plants_produced);
   mNumberOfSeedsUnfacilitatedSet->remove(0);
@@ -860,8 +836,6 @@ void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percenta
   mNumberOfSeedsChart->show();
   nUnfacilitated_plants_produced=0;
   nFacilitated_plants_produced=0;
-  //ui->stackedWidget->addWidget(mNumberOfSeedsChartView);
-
 }
 void MainWindow::calculate_curent_trait_distribution()
 {
@@ -905,19 +879,36 @@ void MainWindow::calculate_curent_trait_distribution()
 
 }
 }
+void MainWindow::new_position_facilitated(plant_coordinats &facilitated_plant_coordinates)
+{
+    int nFacilitated=facilitated_plant_coordinates.size();
+    facilitated_plant_coordinates.clear();
+    int new_position_x=0;
+    int new_position_y=0;
+    for(int j=0; j<nFacilitated; ++j)
+    {
+        new_position_x = facilitated_plant_coordinates[j].first;
+        new_position_y = facilitated_plant_coordinates[j].second;
+        for(int i=0; i<mGeneration; ++i)
+        {
+            int x = (rand() % 7) - 3;
+            int y = (rand() % 7) - 3;
+            new_position_x +=x;
+            new_position_y +=y;
+        }
+        g[new_position_x][new_position_y]=white;
+        facilitated_plant_coordinates.push_back(coordinat(new_position_x, new_position_y);
+    }
+}
 
+void MainWindow::create_new_facilitated_plants(plant_coordinats &facilitated_plant_coordinates, yx_grid& g)
+{
+        new_position_facilitated(facilitated_plant_coordinates);
+
+
+}
 void MainWindow::ShowCurrentTraitDistributionGraph()
 {
-
-    //if(current_trait_distribution.size() == 0 || ui->spinBox_init_n_seeds->value() < prev_plant_trait_size)
-    //{
-        /*current_trait_distribution.clear();
-        for(int i = 0; i < 21; ++i)
-        {
-            current_trait_distribution.push_back(0);
-        }*/
-    //}
-
     prev_plant_trait_size = ui->spinBox_init_n_seeds->value();
 
     mCurrentTraitDistributionChart->removeAllSeries();
@@ -932,9 +923,10 @@ void MainWindow::ShowCurrentTraitDistributionGraph()
     mCurrentTraitDistributionChart->show();
     //ui->stackedWidget->setWidget(mCurrentTraitDistributionView);
 }
-void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant)
+void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant, plant_coordinats &facilitated_plant_coordinates)
 {
-     nurse_plants_seeds(nurse_plant, g);
+     //nurse_plants_seeds(nurse_plant, g);
+     create_new_facilitated_plants(facilitated_plant_coordinates, g);
     //produce new plants
     //remove dead plants
 }
@@ -974,15 +966,15 @@ void MainWindow::on_proportionRatioUF_valueChanged(double arg1)
   setPopulationSize(arg1);
 }
 //generation slider
-void MainWindow::on_horizontalSlider_2_valueChanged(int value)
+void MainWindow::on_slider_generation_valueChanged(int value)
 {
     ui->spinBox_generation->setValue(value);
     mGeneration = value;
 }
 //generation
-void MainWindow::on_spinBox_3_valueChanged(int arg1)
+void MainWindow::on_spinBox_generation_valueChanged(int arg1)
 {
-    ui->horizontalSlider_2->setValue(arg1);
+    ui->slider_generation->setValue(arg1);
     mGeneration = arg1;
 
 }
@@ -1016,7 +1008,7 @@ void MainWindow::on_spinBox_4_valueChanged(int)
 {
     //mRngSeed = arg1;
     mGeneration = 0;
-    ui->horizontalSlider_2->setValue(0);
+    ui->slider_generation->setValue(0);
     ui->spinBox_generation->setValue(0);
 
     //RJCB: set seed directly
@@ -1048,7 +1040,7 @@ void MainWindow::on_pushButton_7_clicked()
 void MainWindow::on_pushButton_run_pressed()
 {
     RemoveGrid();
-    generation_coordinates.clear();
+
 
 }
 //run
@@ -1084,7 +1076,7 @@ void MainWindow::ShowGraphs()
     //ShowCurrentTraitDistributionGraph();
 }
 
-/*
+
 void MainWindow::ClearGrid(const yx_grid& g)
 {
     const int n_rows = g.size();
@@ -1097,11 +1089,11 @@ void MainWindow::ClearGrid(const yx_grid& g)
         {
             assert(j >= 0);
             assert(j < static_cast<int>(g[i].size()));
-            SetPixel(i,j,brown);
+            SetPixel(i,j,black);
         }
     }
 }
-*/
+
 
 yx_grid create_vector_grid(
   const int n_rows,

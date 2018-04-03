@@ -406,7 +406,7 @@
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QSlider" name="horizontalSlider_2">
+           <widget class="QSlider" name="slider_generation">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -452,8 +452,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>820</width>
-         <height>822</height>
+         <width>864</width>
+         <height>830</height>
         </rect>
        </property>
       </widget>
@@ -467,7 +467,7 @@
      <x>0</x>
      <y>0</y>
      <width>1192</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
