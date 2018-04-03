@@ -216,6 +216,7 @@ public slots:
     void set_plant_trait_next_gen( plant_values &plant_trait_values);
     void set_fitness_facilitated();
     void set_fitness_unfacilitated();
+    void clear_fitness_trait_vectors();
 
 
     //void set_seed(); //RJCB: Too simple to keep in

@@ -524,7 +524,6 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
       //the number of facilitated of unfacilitated plants?
       set_plant_trait_next_gen(plant_trait_values);
 
-
       position_in_relation_to_plants(
         g,
         nurse_plant,
@@ -539,8 +538,6 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
     float total_traits_facilitated=0;
     for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
     {
-        total_traits_facilitated+=facilitated_plant_trait_value[i];
-
         const double fitness_facilitated = normal(
           facilitated_plant_trait_value[i],//ui->box_trait_optimum->value(),
           ui->box_fit_fac_opt->value(),
@@ -548,18 +545,17 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
         );
         facilitated_plant_fitness_value.push_back(fitness_facilitated);
     }
+    total_traits_facilitated=facilitated_plant_trait_value.size();
     set_traits_next_gen(m_rng_engine, total_traits_facilitated);
+    clear_fitness_trait_vectors();
     ShowCurrentTraitDistributionGraph();
     float average_trait_value_facilitated=total_traits_facilitated/facilitated_plant_trait_value.size();
     float percentage_facilitated=100*((float)facilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
     float percentage_unfacilitated=100*((float)unfacilitated_plant_coordinates.size()/((float)unfacilitated_plant_coordinates.size()+(float)facilitated_plant_coordinates.size()));//  /n_seeds
-    std::cout<<"unfacilitated size"<< unfacilitated_plant_coordinates.size();
-    std::cout<<"facilitated size"<< facilitated_plant_coordinates.size();
-    //double percentage_unfacilitated=100.0/300.0;//  /n_seeds
-    std::cout<<"percentage unfacilitated: "<<percentage_unfacilitated<< "\n";
-    ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated, average_trait_value_facilitated);
 
+    ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated, average_trait_value_facilitated);
 }
+
 void MainWindow::set_fitness_facilitated()
 {
     for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
@@ -587,15 +583,34 @@ void MainWindow::set_fitness_unfacilitated()
 }
 void MainWindow::set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated)
 {
+       std::vector<double> fitness_all_plants;
        set_fitness_facilitated();
-       std::discrete_distribution<int> dist(facilitated_plant_fitness_value.begin(), facilitated_plant_fitness_value.end());
+       set_fitness_unfacilitated();
+       for(unsigned i=0; i!=facilitated_plant_fitness_value.size(); ++i)
+       {
+           fitness_all_plants.push_back(facilitated_plant_fitness_value[i]);
+       }
 
-         for (int i=0; i!=ui->spinBox_init_n_seeds->value(); ++i)
-         {
-           std::cout << dist(mt) << ' ';
-         }
-         std::cout<<"\n";
-         facilitated_plant_fitness_value.clear();
+       for(unsigned i=0; i!=unfacilitated_plant_fitness_value.size(); ++i)
+       {
+           fitness_all_plants.push_back(unfacilitated_plant_fitness_value[i]);
+       }
+
+       std::discrete_distribution<int> dist(fitness_all_plants.begin(), fitness_all_plants.end());
+       std::cout<<"fitness 25: "<< fitness_all_plants[25] <<"\n";
+       std::cout<<"facilitated size: "<< total_traits_facilitated <<"\n";
+       for (int i=0; i!=ui->spinBox_init_n_seeds->value(); ++i)
+       {
+         std::cout << dist(mt) << ' ';
+       }
+      std::cout<<"\n";
+}
+void MainWindow::clear_fitness_trait_vectors()
+{
+    unfacilitated_plant_fitness_value.clear();
+    facilitated_plant_fitness_value.clear();
+    unfacilitated_plant_trait_value.clear();
+    facilitated_plant_trait_value.clear();
 }
 
 void MainWindow::save_generation(plant_coordinats &nurse_plant)
@@ -807,7 +822,7 @@ void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percenta
     ui->box_fit_fac_opt->value(),
     ui->box_fit_fac_sd->value()
   );
-  std::cout<<"average: "<<average_trait_value_facilitated << "/n";
+  //std::cout<<"average: "<<average_trait_value_facilitated << "/n";
   const double fitness_unfacilitated = normal(
     0.50,//ui->box_trait_optimum->value(),
     ui->box_fit_unfac_opt->value(),
