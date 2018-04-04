@@ -253,9 +253,9 @@ void MainWindow::DrawGrid2()
 #ifdef RJCB_REFACTORED
 Moved to add_nurse_plants
 
-/// nurse_plant_coordinats.back() has a candidate seed
+/// nurse_plant_coordinates.back() has a candidate seed
 void MainWindow::distance_between_nurse_plants(
-  plant_coordinats &nurse_plant_coordinats,
+  plant_coordinats &nurse_plant_coordinates,
   int &add_nurse_plant_i,
   yx_grid& g
 )
@@ -263,7 +263,7 @@ void MainWindow::distance_between_nurse_plants(
     bool distance_enough=true;
     /* Moved to is_good_spot_for_nurse_plant
 
-    int n_nurse_plant_coordinats=nurse_plant_coordinats.size();
+    int n_nurse_plant_coordinates=nurse_plant_coordinates.size();
     for(int i=0; i<n_nurse_plant_coordinats; ++i)
     {
         if(i!=n_nurse_plant_coordinats-1)  //This makes sure the nurse plant doesn't check the distance between its self
@@ -740,16 +740,16 @@ void MainWindow::set_plant_trait_next_gen( plant_values &plant_trait_values)
 
 void MainWindow::set_plants(yx_grid& g)
 {
-    plant_coordinats nurse_plant_coordinats;
+    plant_coordinats nurse_plant_coordinates;
     plant_coordinats facilitated_plant_coordinates;
     plant_coordinats unfacilitated_plant_coordinates;
     plant_trait_values.clear();
-    add_nurse_plants(g, nurse_plant_coordinats);
-    assert(static_cast<int>(nurse_plant_coordinats.size()) == ui->spinBox_n_nurse->value());
-    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
+    add_nurse_plants(g, nurse_plant_coordinates);
+    assert(static_cast<int>(nurse_plant_coordinates.size()) == ui->spinBox_n_nurse->value());
+    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinates, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
     if(ui->spinBox_generation->value() > 0)
     {
-        GenerateGeneration(g, nurse_plant_coordinats, facilitated_plant_coordinates);
+        GenerateGeneration(g, nurse_plant_coordinates, facilitated_plant_coordinates);
     }
 }
 void MainWindow::CreateGrid()
@@ -1119,13 +1119,13 @@ yx_grid create_vector_grid(
 
 bool is_good_spot_for_nurse_plant(
   const coordinat& c,
-  const plant_coordinats& nurse_plant_coordinats,
+  const plant_coordinats& nurse_plant_coordinates,
   const int min_dx,
   const int min_dy
 )
 {
     // npc: Nurse Plant Coordinat
-    for(const auto& npc: nurse_plant_coordinats)
+    for(const auto& npc: nurse_plant_coordinates)
     {
         const int dx=std::abs(npc.first - c.first);
         const int dy=std::abs(npc.second - c.second);

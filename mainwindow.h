@@ -214,7 +214,7 @@ public slots:
     void new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g, const int generation_cycle);
     void nurse_plants_seeds(plant_coordinats &nurse_plant, yx_grid& g);
     void set_plant_trait_next_gen( plant_values &plant_trait_values);
-    int  new_position_facilitated(plant_coordinats &facilitated_plant_coordinates);
+    void new_position_facilitated(plant_coordinats &facilitated_plant_coordinates);
     void create_new_facilitated_plants(plant_coordinats &facilitated_plant_coordinates, yx_grid& g);
     void set_fitness_facilitated();
     void set_fitness_unfacilitated();

@@ -358,27 +358,6 @@
           <string>Simulation</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="2" column="0">
-           <widget class="QPushButton" name="pushButton_6">
-            <property name="text">
-             <string>Show Grid</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="pushButton_run">
-            <property name="text">
-             <string>Run</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="pushButton_5">
-            <property name="text">
-             <string>Explanation</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="font">
@@ -388,13 +367,6 @@
             </property>
             <property name="text">
              <string>generation:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Reset</string>
             </property>
            </widget>
           </item>
@@ -424,7 +396,28 @@
           <item row="3" column="0">
            <widget class="QPushButton" name="pushButton_7">
             <property name="text">
-             <string>Enlarge Graph</string>
+             <string>Show Graphs</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="pushButton_6">
+            <property name="text">
+             <string>Show Grid</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="pushButton_5">
+            <property name="text">
+             <string>Explanation</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Reset</string>
             </property>
            </widget>
           </item>
@@ -452,8 +445,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>864</width>
-         <height>830</height>
+         <width>846</width>
+         <height>824</height>
         </rect>
        </property>
       </widget>
@@ -467,7 +460,7 @@
      <x>0</x>
      <y>0</y>
      <width>1192</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
