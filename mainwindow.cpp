@@ -631,9 +631,10 @@ void MainWindow::set_fitness_unfacilitated()
 }
 void MainWindow::set_traits_next_gen(std::mt19937& mt)
 {
-
-        int total_traits_facilitated=0;
-        total_traits_facilitated=facilitated_plant_trait_value.size();
+       nFacilitated_plants_produced=0;
+       nUnfacilitated_plants_produced=0;
+       int total_traits_facilitated=0;
+       total_traits_facilitated=facilitated_plant_trait_value.size();
        std::vector<double> fitness_all_plants;
        set_fitness_facilitated();
        set_fitness_unfacilitated();
@@ -652,10 +653,9 @@ void MainWindow::set_traits_next_gen(std::mt19937& mt)
 
 
        //std::cout<<"facilitated size: "<< total_traits_facilitated <<"\n";
-       for (int i=0; i!=total_traits_facilitated; ++i)
+       for (int i=0; i!=ui->spinBox_init_n_seeds->value(); ++i)
        {
-
-        //std::cout<<plants_that_reproduce_facilitated[i]<< " ";
+         //std::cout<<plants_that_reproduce_facilitated[i]<< " ";
          //std::cout << dist(mt) << ' ';
          if(dist(mt) < total_traits_facilitated)
          {
@@ -670,7 +670,7 @@ void MainWindow::set_traits_next_gen(std::mt19937& mt)
          }
        }
        std::cout<<"nFacilitated_plants_produced: " <<nFacilitated_plants_produced << "\n";
-        std::cout<<"unfacilitated_plants_produced: " <<nUnfacilitated_plants_produced << "\n";
+       std::cout<<"unfacilitated_plants_produced: " <<nUnfacilitated_plants_produced << "\n";
       //std::cout<<"\n";
 
 }
