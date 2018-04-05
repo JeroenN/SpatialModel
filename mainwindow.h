@@ -141,6 +141,8 @@ public slots:
     QChartView *mTraitDistributionInTimeView;
     QScatterSeries *mTraitDistributionInTimeFacilitatedSeries;
     QScatterSeries *mTraitDistributionInTimeUnfacilitatedSeries;
+    std::vector<std::vector<float>> generationTraitValues;
+
     int calculate_amount_of_different_plant_trait_values();
 
     int n_facilitated_plant;

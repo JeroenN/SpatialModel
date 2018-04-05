@@ -192,6 +192,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->box_fit_unfac_opt, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
     QObject::connect(ui->box_fit_unfac_sd, SIGNAL(valueChanged(double)), this, SLOT(ShowGraphs()));
     ShowGraphs();
+
 }
 
 MainWindow::~MainWindow()
@@ -983,6 +984,16 @@ void MainWindow::ShowCurrentTraitDistributionGraph()
 }
 void MainWindow::ShowTraitDistributionInTimeGraph()
 {
+    std::vector<float> traitValue;
+    for(int i = 0; i < 10; ++i)
+    {
+        for(int p =0; p < 1; p+=0.02)
+        {
+            traitValue.push_back(p);
+        }
+        generationTraitValues.push_back(traitValue);
+
+    }
     //only when changing n_seeds
 
     mTraitDistributionInTimeChart->removeAllSeries();
