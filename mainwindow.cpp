@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "explanation.h"
 #include <QApplication>
+#include <algorithm>
 #include <vector>
 #include <iostream>
 #include <random>
@@ -29,6 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mFitnessSeriesUnfacilitated(new QLineSeries),
     mNumberOfSeedsChart(new QChart),
     mCurrentTraitDistributionChart(new QChart),
+    mTraitDistributionInTimeChart(new QChart),
+    mTraitDistributionInTimeFacilitatedSeries(new QScatterSeries),
+    mTraitDistributionInTimeUnfacilitatedSeries(new QScatterSeries),
     m_seagrass_widget{new ribi::mb::QtMutualismBreakdownerSpatialWidget(10,10)}
 {
     ui->setupUi(this);
@@ -80,16 +84,13 @@ MainWindow::MainWindow(QWidget *parent) :
       mNumberOfSeedsChartView->setRenderHint(QPainter::Antialiasing);
       ui->results->layout()->addWidget(mNumberOfSeedsChartView);
       mNumberOfSeedsChart->setMinimumHeight(400);
-
-      //mNumberOfSeedsChartView->setHidden(true);
-
       mNumberOfSeedsChart->createDefaultAxes();
       mNumberOfSeedsChart->setTitle("Number of seeds produced");
       mNumberOfSeedsFacilitatedSet = new QBarSet("Facilitated");
       mNumberOfSeedsUnfacilitatedSet = new QBarSet("Unfacilitated");
       std::cout<<" total plants 1:  " <<ui->spinBox_init_n_seeds->value() << "\n";
-      *mNumberOfSeedsFacilitatedSet << 1000; //ui->spinBox_init_n_seeds->value() doesnt seem to work here, dont know why...
-      *mNumberOfSeedsUnfacilitatedSet << 1000;
+      *mNumberOfSeedsFacilitatedSet << 100; //ui->spinBox_init_n_seeds->value() doesnt seem to work here, dont know why...
+      *mNumberOfSeedsUnfacilitatedSet << 100;
       QBarSeries *series = new QBarSeries();
       series->append(mNumberOfSeedsUnfacilitatedSet);
       series->append(mNumberOfSeedsFacilitatedSet);
@@ -131,7 +132,33 @@ MainWindow::MainWindow(QWidget *parent) :
         series->append(CurrentTraitdistributionSets);
         mCurrentTraitDistributionChart->addSeries(series);
     }
+    //trait distribution in time
+    {
+        mTraitDistributionInTimeView = new QChartView(mTraitDistributionInTimeChart);
+        mTraitDistributionInTimeView->setRenderHint(QPainter::Antialiasing);
+        ui->results->layout()->addWidget(mTraitDistributionInTimeView);
+        mTraitDistributionInTimeChart->setMinimumHeight(400);
 
+        mTraitDistributionInTimeChart->setTitle("Trait distribution in time");
+        mTraitDistributionInTimeChart->addSeries(mTraitDistributionInTimeUnfacilitatedSeries);
+        mTraitDistributionInTimeChart->addSeries(mTraitDistributionInTimeFacilitatedSeries);
+        QValueAxis *axisX = new QValueAxis;
+        axisX->setRange(0,100);
+        axisX->setTitleText("Generation");
+        QValueAxis *axisY = new QValueAxis;
+        axisY->setTitleText("Fitness");
+        axisY->setRange(-1,2);
+        axisY->setTitleText("Trait value");
+        mTraitDistributionInTimeChart->setAxisX(axisX);
+        mTraitDistributionInTimeChart->setAxisY(axisY);
+        mTraitDistributionInTimeFacilitatedSeries->setName("facilitated");
+        mTraitDistributionInTimeFacilitatedSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        mTraitDistributionInTimeFacilitatedSeries->setMarkerSize(1.0);
+        mTraitDistributionInTimeUnfacilitatedSeries->setName("unfacilitated");
+        mTraitDistributionInTimeUnfacilitatedSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        mTraitDistributionInTimeUnfacilitatedSeries->setMarkerSize(1.0);
+
+    }
     //m_image = new QImage();
     //ui->pushButton_2->setHidden(true);
     ui->pushButton_6->setHidden(true);
@@ -253,9 +280,9 @@ void MainWindow::DrawGrid2()
 #ifdef RJCB_REFACTORED
 Moved to add_nurse_plants
 
-/// nurse_plant_coordinates.back() has a candidate seed
+/// nurse_plant_coordinats.back() has a candidate seed
 void MainWindow::distance_between_nurse_plants(
-  plant_coordinats &nurse_plant_coordinates,
+  plant_coordinats &nurse_plant_coordinats,
   int &add_nurse_plant_i,
   yx_grid& g
 )
@@ -263,7 +290,7 @@ void MainWindow::distance_between_nurse_plants(
     bool distance_enough=true;
     /* Moved to is_good_spot_for_nurse_plant
 
-    int n_nurse_plant_coordinates=nurse_plant_coordinates.size();
+    int n_nurse_plant_coordinats=nurse_plant_coordinats.size();
     for(int i=0; i<n_nurse_plant_coordinats; ++i)
     {
         if(i!=n_nurse_plant_coordinats-1)  //This makes sure the nurse plant doesn't check the distance between its self
@@ -438,13 +465,14 @@ bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinats un
 }
 
 ///RJCB: Please as a friend what he/she expects from a function
-///  with name 'put_seed'.
+///  with name 'position_in_relation_to_plants'.
 ///  No idea what this function did at first!
 /// 'put_seed'?
 /// @param g grid that will have a seed added
-void MainWindow::put_seed(
+void MainWindow::position_in_relation_to_plants(
   yx_grid& g,
-  const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats //RJCB: Those were not seed, those were seed coordinats
+  const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats
+  const plant_coordinats& seed_coordinats, //RJCB: Those were not seed, those were seed coordinats
   plant_coordinats &facilitated_plant_coordinates,
   plant_coordinats &unfacilitated_plant_coordinates,
   const coordinat& c,
@@ -462,7 +490,7 @@ void MainWindow::put_seed(
     //See if the seed has fallen close to a nurse plant
     for(const auto& npc: nurse_plant_coordinats)
     {
-        const auto& last_seed_coordinat = seed_coordinates.back();
+        const auto& last_seed_coordinat = seed_coordinats.back();
         const int dx=std::abs(npc.first - last_seed_coordinat.first);
         const int dy=std::abs(npc.second - last_seed_coordinat.second);
         position_check_facilitated_plant(
@@ -476,12 +504,12 @@ void MainWindow::put_seed(
     }
     if(make_facilitated_plant==true && n_seeds_to_add>0)
     {
+          QColor green= QColor(0, 127 +plant_trait_values[plant_trait_values.size()-1]*128, 0);
+          facilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= green;
          facilitated_plant_coordinates.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant_coordinates)==true)
          {
-             QColor green= QColor(0, 127 +plant_trait_values[plant_trait_values.size()-1]*128, 0);
-             facilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
-             g[seed_coordinates[seed_coordinates.size()-1].second][seed_coordinates[seed_coordinates.size()-1].first]= green;
             --n_seeds_to_add;
          }
          else
@@ -494,7 +522,7 @@ void MainWindow::put_seed(
     {
         QColor red= QColor(plant_trait_values[plant_trait_values.size()-1]*190+20,0, 0);
         unfacilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
-         g[seed_coordinates[seed_coordinates.size()-1].second][seed_coordinates[seed_coordinates.size()-1].first]=red;
+         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=red;
          unfacilitated_plant_coordinates.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant_coordinates)==true)
          {
@@ -517,74 +545,42 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
 )
 {
     m_rng_engine = std::mt19937(ui->spinBox_rng_seed->value());
-    seed_coordinates.clear();
-    seed_coordinates_per_generation.clear();
+    int n_seeds_to_add = ui->spinBox_init_n_seeds->value();
+    plant_coordinats seed_coordinates;
+
     //Create as much facilitated and unfacilitated plants as needed
 
-    for(int i=0; i<mGeneration; ++i)
+    while(n_seeds_to_add>0)
     {
-        int n_seeds_to_add = ui->spinBox_init_n_seeds->value();
+      //Create a random seed
+      const int x=rand() % g[0].size();
+      const int y=rand() % g.size();
+      const coordinat c(x,y);
+      seed_coordinates.push_back(c);
+      plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
+      //Determine what this seed will add up to:
+      //the number of facilitated of unfacilitated plants?
+      set_plant_trait_next_gen(plant_trait_values);
 
-        while(n_seeds_to_add>0)
-        {
-          //Create a random seed
-          const int x=rand() % g[0].size();
-          const int y=rand() % g.size();
-          const coordinat c(x,y);
-
-          //create random trait
-          if(mGeneration==1)
-          {
-              plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
-              set_plant_trait_next_gen(plant_trait_values);
-          }
-
-          if(mGeneration-1==i)
-          {
-              plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
-              seed_coordinates.push_back(c);
-
-              //Determine what this seed will add up to:
-              //the number of facilitated of unfacilitated plants?
-              put_seed(
-                g,
-                nurse_plant,
-                facilitated_plant_coordinates,
-                unfacilitated_plant_coordinates,
-                c,
-                n_seeds_to_add,
-                plant_trait_values
-              );
-           }
-          else
-          {
-              n_seeds_to_add-=1;
-          }
-          std::cout<<"mGeneration: "<< mGeneration << "\n";
-          set_traits_next_gen(m_rng_engine);
-          std::cout<<"i: "<< i << "\n";
-        }
-
+      position_in_relation_to_plants(
+        g,
+        nurse_plant,
+        seed_coordinates,
+        facilitated_plant_coordinates,
+        unfacilitated_plant_coordinates,
+        c,
+        n_seeds_to_add,
+        plant_trait_values
+      );
     }
-
-   // plant_coordinats new_seed_coordinates;
-
-    //Toevoegen van laatste generatie aan grid
-    /*
-    if(mGeneration>0)
-    new_seed_coordinates=seed_coordinates_per_generation[seed_coordinates_per_generation.size()-1];
-
-    for(unsigned i=(mGeneration-1)*(ui->spinBox_init_n_seeds->value()); i<new_seed_coordinates.size(); i++)
-    {
-
-    }
-    std::cout<<"seed cordinates size: "<<new_seed_coordinates.size()-(mGeneration-1)*(ui->spinBox_init_n_seeds->value()) <<"\n";
-*/
-
     float total_traits_facilitated=0;
+
     total_traits_facilitated=facilitated_plant_trait_value.size();
+    set_traits_next_gen(m_rng_engine, total_traits_facilitated);
+    ShowTraitDistributionInTimeGraph();
     clear_fitness_trait_vectors();
     ShowCurrentTraitDistributionGraph();
+    //float total_traits_facilitated=0;
     float total_traits_unfacilitated=0;
     for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
     {
@@ -594,13 +590,7 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
     {
         total_traits_unfacilitated+=unfacilitated_plant_trait_value[i];
     }
-    float average_trait_value_facilitated=total_traits_facilitated/facilitated_plant_trait_value.size();
-    float average_trait_value_unfacilitated=total_traits_unfacilitated/unfacilitated_plant_trait_value.size();
-
-    float percentage_facilitated=facilitated_plant_coordinates.size();
-    float percentage_unfacilitated=unfacilitated_plant_coordinates.size();
-
-    ShowNumberOfSeedsGraph(percentage_facilitated, percentage_unfacilitated, average_trait_value_facilitated, average_trait_value_unfacilitated);
+    ShowNumberOfSeedsGraph(0, 0, 0, 0);
 }
 
 void MainWindow::set_fitness_facilitated()
@@ -629,12 +619,8 @@ void MainWindow::set_fitness_unfacilitated()
         unfacilitated_plant_fitness_value.push_back(fitness_unfacilitated);
     }
 }
-void MainWindow::set_traits_next_gen(std::mt19937& mt)
+void MainWindow::set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated)
 {
-       nFacilitated_plants_produced=0;
-       nUnfacilitated_plants_produced=0;
-       int total_traits_facilitated=0;
-       total_traits_facilitated=facilitated_plant_trait_value.size();
        std::vector<double> fitness_all_plants;
        set_fitness_facilitated();
        set_fitness_unfacilitated();
@@ -650,29 +636,21 @@ void MainWindow::set_traits_next_gen(std::mt19937& mt)
 
        std::discrete_distribution<int> dist(fitness_all_plants.begin(), fitness_all_plants.end());
 
-
-
-       //std::cout<<"facilitated size: "<< total_traits_facilitated <<"\n";
+       std::cout<<"facilitated size: "<< total_traits_facilitated <<"\n";
        for (int i=0; i!=ui->spinBox_init_n_seeds->value(); ++i)
        {
-         //std::cout<<plants_that_reproduce_facilitated[i]<< " ";
-         //std::cout << dist(mt) << ' ';
+
+         std::cout << dist(mt) << ' ';
          if(dist(mt) < total_traits_facilitated)
          {
-
-             plants_that_reproduce_facilitated.push_back(dist(mt));
              nFacilitated_plants_produced+=1;
          }
          else
          {
-             plants_that_reproduce_unfacilitated.push_back(dist(mt));
              nUnfacilitated_plants_produced+=1;
          }
        }
-       std::cout<<"nFacilitated_plants_produced: " <<nFacilitated_plants_produced << "\n";
-       std::cout<<"unfacilitated_plants_produced: " <<nUnfacilitated_plants_produced << "\n";
-      //std::cout<<"\n";
-
+      std::cout<<"\n";
 }
 void MainWindow::clear_fitness_trait_vectors()
 {
@@ -714,6 +692,13 @@ void MainWindow::check_seed_nurse_plant_coordinates(
         nurse_plant_y = nurse_plant[i].second;
         nurse_plant_y+=y;
     }
+/*
+    assert(nurse_plant_y>0);
+    assert(nurse_plant_y<g.size());
+
+    assert(nurse_plant_x>0);
+    assert(nurse_plant_x<g[0].size());
+    */
 }
 void MainWindow::new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g, const int generation_cycle)
 {
@@ -777,16 +762,16 @@ void MainWindow::set_plant_trait_next_gen( plant_values &plant_trait_values)
 
 void MainWindow::set_plants(yx_grid& g)
 {
-    plant_coordinats nurse_plant_coordinates;
+    plant_coordinats nurse_plant_coordinats;
     plant_coordinats facilitated_plant_coordinates;
     plant_coordinats unfacilitated_plant_coordinates;
     plant_trait_values.clear();
-    add_nurse_plants(g, nurse_plant_coordinates);
-    assert(static_cast<int>(nurse_plant_coordinates.size()) == ui->spinBox_n_nurse->value());
-    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinates, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
+    add_nurse_plants(g, nurse_plant_coordinats);
+    assert(static_cast<int>(nurse_plant_coordinats.size()) == ui->spinBox_n_nurse->value());
+    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
     if(ui->spinBox_generation->value() > 0)
     {
-        GenerateGeneration(g, nurse_plant_coordinates, facilitated_plant_coordinates);
+        GenerateGeneration(g, nurse_plant_coordinats, facilitated_plant_coordinates);
     }
 }
 void MainWindow::CreateGrid()
@@ -799,6 +784,7 @@ void MainWindow::CreateGrid()
     );
     set_plants(grid);
     DrawGrid(grid);
+
     m_seagrass_widget->update();
     this->update();
 }
@@ -872,12 +858,25 @@ void MainWindow::ShowFitnessGraph()
   );*/
 }
 
-void MainWindow::ShowNumberOfSeedsGraph(int percentage_facilitated, int percentage_unfacilitated, float average_trait_value_facilitated, float average_trait_value_unfacilitated)
+void MainWindow::ShowNumberOfSeedsGraph(int , int , float , float)
 {
-  mNumberOfSeedsFacilitatedSet->remove(0);
-  mNumberOfSeedsFacilitatedSet->append(nFacilitated_plants_produced);
-  mNumberOfSeedsUnfacilitatedSet->remove(0);
-  mNumberOfSeedsUnfacilitatedSet->append(nUnfacilitated_plants_produced);
+    mNumberOfSeedsChart->removeAllSeries();
+    mNumberOfSeedsFacilitatedSet = new QBarSet("facilitated");
+    mNumberOfSeedsUnfacilitatedSet = new QBarSet("unfacilitated");
+    QBarSeries *series = new QBarSeries();
+    *mNumberOfSeedsFacilitatedSet << nFacilitated_plants_produced;
+    *mNumberOfSeedsUnfacilitatedSet << nUnfacilitated_plants_produced;
+    qDebug() <<"fpp: "<<nFacilitated_plants_produced;
+    qDebug() <<"ufpp: "<<nUnfacilitated_plants_produced;
+
+  series->append(mNumberOfSeedsUnfacilitatedSet);
+  series->append(mNumberOfSeedsFacilitatedSet);
+  QValueAxis *axisY = new QValueAxis;
+  axisY->setTitleText("Amount of plants");
+  axisY->setRange(0, std::max(nFacilitated_plants_produced,nUnfacilitated_plants_produced));
+  mNumberOfSeedsChart->setAxisY(axisY);
+  mNumberOfSeedsChart->addSeries(series);
+
   mNumberOfSeedsChart->show();
   nUnfacilitated_plants_produced=0;
   nFacilitated_plants_produced=0;
@@ -949,6 +948,18 @@ void MainWindow::new_position_facilitated(plant_coordinats &facilitated_plant_co
         }
 
 }*/
+int MainWindow::calculate_amount_of_different_plant_trait_values()
+{
+    int amount = 0;
+    for(unsigned i = 0; i < current_trait_distribution.size(); ++i)
+    {
+        if(current_trait_distribution[i] != 0 && current_trait_distribution[i] > amount)
+        {
+            amount = current_trait_distribution[i];
+        }
+    }
+    return amount;
+}
 void MainWindow::ShowCurrentTraitDistributionGraph()
 {
     prev_plant_trait_size = ui->spinBox_init_n_seeds->value();
@@ -961,9 +972,45 @@ void MainWindow::ShowCurrentTraitDistributionGraph()
             << current_trait_distribution[8] << current_trait_distribution[9] << current_trait_distribution[10] << current_trait_distribution[11] << current_trait_distribution[12] << current_trait_distribution[13] << current_trait_distribution[14] << current_trait_distribution[15]
             << current_trait_distribution[16] << current_trait_distribution[17] << current_trait_distribution[18] << current_trait_distribution[19] <<current_trait_distribution[20];
     series->append(CurrentTraitdistributionSets);
+    QValueAxis *axisY = new QValueAxis;
+    axisY->setTitleText("Amount of plants");
+    int amount = calculate_amount_of_different_plant_trait_values();
+    axisY->setRange(0, amount);
+    mCurrentTraitDistributionChart->setAxisY(axisY);
     mCurrentTraitDistributionChart->addSeries(series);
     mCurrentTraitDistributionChart->show();
     //ui->stackedWidget->setWidget(mCurrentTraitDistributionView);
+}
+void MainWindow::ShowTraitDistributionInTimeGraph()
+{
+    //only when changing n_seeds
+
+    mTraitDistributionInTimeChart->removeAllSeries();
+
+    mTraitDistributionInTimeUnfacilitatedSeries = new QScatterSeries();
+    mTraitDistributionInTimeUnfacilitatedSeries->setName("unfacilitated");
+    mTraitDistributionInTimeUnfacilitatedSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    mTraitDistributionInTimeUnfacilitatedSeries->setMarkerSize(10);
+    mTraitDistributionInTimeFacilitatedSeries = new QScatterSeries();
+    mTraitDistributionInTimeFacilitatedSeries->setName("facilitated");
+    mTraitDistributionInTimeFacilitatedSeries->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+    mTraitDistributionInTimeFacilitatedSeries->setMarkerSize(10);
+    //append trait values facilitated and unfacilitated
+
+    for(unsigned i = 0; i < facilitated_plant_trait_value.size(); ++i)
+    {
+        mTraitDistributionInTimeFacilitatedSeries->append(ui->spinBox_generation->value(), facilitated_plant_trait_value[i]);
+    }
+    for(unsigned i = 0; i < unfacilitated_plant_trait_value.size(); ++i)
+    {
+        mTraitDistributionInTimeUnfacilitatedSeries->append(ui->spinBox_generation->value(), unfacilitated_plant_trait_value[i]);
+    }
+    mTraitDistributionInTimeChart->addSeries(mTraitDistributionInTimeUnfacilitatedSeries);
+    mTraitDistributionInTimeChart->addSeries(mTraitDistributionInTimeFacilitatedSeries);
+
+    //only works with DefaultAxes :/
+    mTraitDistributionInTimeChart->createDefaultAxes();
+    mTraitDistributionInTimeChart->show();
 }
 void MainWindow::GenerateGeneration(yx_grid& g, plant_coordinats &nurse_plant, plant_coordinats &facilitated_plant_coordinates)
 {
@@ -1064,7 +1111,6 @@ void MainWindow::on_pushButton_6_clicked()
     ui->scrollArea->verticalScrollBar()->setValue(
     ui->scrollArea->verticalScrollBar()->minimum());
     //ui->tableWidget->setHidden(false);
-    //mNumberOfSeedsChartView->setHidden(true);
     //mCurrentTraitDistributionView->setHidden(true);
     CreateGrid();
 
@@ -1077,7 +1123,6 @@ void MainWindow::on_pushButton_7_clicked()
     ui->scrollArea->verticalScrollBar()->setValue(
     ui->scrollArea->verticalScrollBar()->maximum());
     //ui->tableWidget->setHidden(true);
-    //mNumberOfSeedsChartView->setHidden(false);
     //mCurrentTraitDistributionView->setHidden(false);
     RemoveGrid();
 }
@@ -1118,7 +1163,6 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::ShowGraphs()
 {
     ShowFitnessGraph();
-    //ShowNumberOfSeedsGraph();
     //ShowCurrentTraitDistributionGraph();
 }
 
@@ -1155,13 +1199,13 @@ yx_grid create_vector_grid(
 
 bool is_good_spot_for_nurse_plant(
   const coordinat& c,
-  const plant_coordinats& nurse_plant_coordinates,
+  const plant_coordinats& nurse_plant_coordinats,
   const int min_dx,
   const int min_dy
 )
 {
     // npc: Nurse Plant Coordinat
-    for(const auto& npc: nurse_plant_coordinates)
+    for(const auto& npc: nurse_plant_coordinats)
     {
         const int dx=std::abs(npc.first - c.first);
         const int dy=std::abs(npc.second - c.second);
