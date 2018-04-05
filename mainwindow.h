@@ -149,7 +149,7 @@ public slots:
 
     ///The number of nurse plants
     //int mNnursePlants; //RJCB: Made this an int, was a float
-    int mGeneration = 0;
+    int mGeneration = 1;
     //int mRngSeed; //RJCB: Just read from GUI
     float temperatureChange;
     std::vector<float> facilitated_plant_trait_value;
@@ -165,12 +165,16 @@ public slots:
     int gridXEnd;
     int gridYStart;
     int gridYEnd;
+    std::vector<int> plants_that_reproduce_facilitated;
+    std::vector<int> plants_that_reproduce_unfacilitated;
     std::vector<double>facilitated_plant_fitness_value;
     std::vector<double>unfacilitated_plant_fitness_value;
-    void set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated);
+    void set_traits_next_gen(std::mt19937& mt);
     std::mt19937 m_rng_engine;
     int nFacilitated_plants_produced;
     int nUnfacilitated_plants_produced;
+    plant_coordinats seed_coordinates;
+    std::vector<plant_coordinats> seed_coordinates_per_generation;
     ///The history of all plants
     generations generation_coordinates;
 
@@ -187,10 +191,9 @@ public slots:
     void position_check_facilitated_plant(int position_difference_x, int position_difference_y, bool &make_facilitated_plant,
                                           bool &make_unfacilitated_plant, bool &stop_unfaciliated, bool &stop_faciliated);
 
-    void position_in_relation_to_plants(
+    void put_seed(
       yx_grid& g,
-      const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats
-      const plant_coordinats& seed_coordinats, //RJCB: Those were not seed, those were seed coordinats
+      const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats //RJCB: Those were not seed, those were seed coordinats
       plant_coordinats &facilitated_plant_coordinates,
       plant_coordinats &unfacilitated_plant_coordinates,
       const coordinat& c,

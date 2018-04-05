@@ -372,6 +372,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QSpinBox" name="spinBox_generation">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
              <number>100</number>
             </property>
@@ -445,8 +448,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>846</width>
-         <height>824</height>
+         <width>865</width>
+         <height>830</height>
         </rect>
        </property>
       </widget>
@@ -460,7 +463,7 @@
      <x>0</x>
      <y>0</y>
      <width>1192</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

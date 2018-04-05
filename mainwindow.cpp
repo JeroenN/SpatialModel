@@ -88,8 +88,8 @@ MainWindow::MainWindow(QWidget *parent) :
       mNumberOfSeedsFacilitatedSet = new QBarSet("Facilitated");
       mNumberOfSeedsUnfacilitatedSet = new QBarSet("Unfacilitated");
       std::cout<<" total plants 1:  " <<ui->spinBox_init_n_seeds->value() << "\n";
-      *mNumberOfSeedsFacilitatedSet << 100; //ui->spinBox_init_n_seeds->value() doesnt seem to work here, dont know why...
-      *mNumberOfSeedsUnfacilitatedSet << 100;
+      *mNumberOfSeedsFacilitatedSet << 1000; //ui->spinBox_init_n_seeds->value() doesnt seem to work here, dont know why...
+      *mNumberOfSeedsUnfacilitatedSet << 1000;
       QBarSeries *series = new QBarSeries();
       series->append(mNumberOfSeedsUnfacilitatedSet);
       series->append(mNumberOfSeedsFacilitatedSet);
@@ -253,9 +253,9 @@ void MainWindow::DrawGrid2()
 #ifdef RJCB_REFACTORED
 Moved to add_nurse_plants
 
-/// nurse_plant_coordinats.back() has a candidate seed
+/// nurse_plant_coordinates.back() has a candidate seed
 void MainWindow::distance_between_nurse_plants(
-  plant_coordinats &nurse_plant_coordinats,
+  plant_coordinats &nurse_plant_coordinates,
   int &add_nurse_plant_i,
   yx_grid& g
 )
@@ -263,7 +263,7 @@ void MainWindow::distance_between_nurse_plants(
     bool distance_enough=true;
     /* Moved to is_good_spot_for_nurse_plant
 
-    int n_nurse_plant_coordinats=nurse_plant_coordinats.size();
+    int n_nurse_plant_coordinates=nurse_plant_coordinates.size();
     for(int i=0; i<n_nurse_plant_coordinats; ++i)
     {
         if(i!=n_nurse_plant_coordinats-1)  //This makes sure the nurse plant doesn't check the distance between its self
@@ -438,14 +438,13 @@ bool MainWindow::distance_between_unfacilitated_plants(const plant_coordinats un
 }
 
 ///RJCB: Please as a friend what he/she expects from a function
-///  with name 'position_in_relation_to_plants'.
+///  with name 'put_seed'.
 ///  No idea what this function did at first!
 /// 'put_seed'?
 /// @param g grid that will have a seed added
-void MainWindow::position_in_relation_to_plants(
+void MainWindow::put_seed(
   yx_grid& g,
-  const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats
-  const plant_coordinats& seed_coordinats, //RJCB: Those were not seed, those were seed coordinats
+  const plant_coordinats& nurse_plant_coordinats, //RJCB: Those were not nurse plants, those were nurse plant coordinats //RJCB: Those were not seed, those were seed coordinats
   plant_coordinats &facilitated_plant_coordinates,
   plant_coordinats &unfacilitated_plant_coordinates,
   const coordinat& c,
@@ -463,7 +462,7 @@ void MainWindow::position_in_relation_to_plants(
     //See if the seed has fallen close to a nurse plant
     for(const auto& npc: nurse_plant_coordinats)
     {
-        const auto& last_seed_coordinat = seed_coordinats.back();
+        const auto& last_seed_coordinat = seed_coordinates.back();
         const int dx=std::abs(npc.first - last_seed_coordinat.first);
         const int dy=std::abs(npc.second - last_seed_coordinat.second);
         position_check_facilitated_plant(
@@ -477,12 +476,12 @@ void MainWindow::position_in_relation_to_plants(
     }
     if(make_facilitated_plant==true && n_seeds_to_add>0)
     {
-          QColor green= QColor(0, 127 +plant_trait_values[plant_trait_values.size()-1]*128, 0);
-          facilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
-         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]= green;
          facilitated_plant_coordinates.push_back(c);
          if(distance_between_facilitated_plants(facilitated_plant_coordinates)==true)
          {
+             QColor green= QColor(0, 127 +plant_trait_values[plant_trait_values.size()-1]*128, 0);
+             facilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
+             g[seed_coordinates[seed_coordinates.size()-1].second][seed_coordinates[seed_coordinates.size()-1].first]= green;
             --n_seeds_to_add;
          }
          else
@@ -495,7 +494,7 @@ void MainWindow::position_in_relation_to_plants(
     {
         QColor red= QColor(plant_trait_values[plant_trait_values.size()-1]*190+20,0, 0);
         unfacilitated_plant_trait_value.push_back(plant_trait_values[plant_trait_values.size()-1]);
-         g[seed_coordinats[seed_coordinats.size()-1].second][seed_coordinats[seed_coordinats.size()-1].first]=red;
+         g[seed_coordinates[seed_coordinates.size()-1].second][seed_coordinates[seed_coordinates.size()-1].first]=red;
          unfacilitated_plant_coordinates.push_back(c);
          if(distance_between_unfacilitated_plants(unfacilitated_plant_coordinates)==true)
          {
@@ -518,41 +517,74 @@ void MainWindow::set_facilitated_and_unfacilitated_plants(
 )
 {
     m_rng_engine = std::mt19937(ui->spinBox_rng_seed->value());
-    int n_seeds_to_add = ui->spinBox_init_n_seeds->value();
-    plant_coordinats seed_coordinates;
-
+    seed_coordinates.clear();
+    seed_coordinates_per_generation.clear();
     //Create as much facilitated and unfacilitated plants as needed
 
-    while(n_seeds_to_add>0)
+    for(int i=0; i<mGeneration; ++i)
     {
-      //Create a random seed
-      const int x=rand() % g[0].size();
-      const int y=rand() % g.size();
-      const coordinat c(x,y);
-      seed_coordinates.push_back(c);
-      plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
-      //Determine what this seed will add up to:
-      //the number of facilitated of unfacilitated plants?
-      set_plant_trait_next_gen(plant_trait_values);
+        int n_seeds_to_add = ui->spinBox_init_n_seeds->value();
 
-      position_in_relation_to_plants(
-        g,
-        nurse_plant,
-        seed_coordinates,
-        facilitated_plant_coordinates,
-        unfacilitated_plant_coordinates,
-        c,
-        n_seeds_to_add,
-        plant_trait_values
-      );
+        while(n_seeds_to_add>0)
+        {
+          //Create a random seed
+          const int x=rand() % g[0].size();
+          const int y=rand() % g.size();
+          const coordinat c(x,y);
+
+          //create random trait
+          if(mGeneration==1)
+          {
+              plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
+              set_plant_trait_next_gen(plant_trait_values);
+          }
+
+          if(mGeneration-1==i)
+          {
+              plant_trait_values.push_back(getRandomNormal(m_rng_engine, ui->spinBox_traits_mean->value(),  ui->spinBox_traits_dev->value()));
+              seed_coordinates.push_back(c);
+
+              //Determine what this seed will add up to:
+              //the number of facilitated of unfacilitated plants?
+              put_seed(
+                g,
+                nurse_plant,
+                facilitated_plant_coordinates,
+                unfacilitated_plant_coordinates,
+                c,
+                n_seeds_to_add,
+                plant_trait_values
+              );
+           }
+          else
+          {
+              n_seeds_to_add-=1;
+          }
+          std::cout<<"mGeneration: "<< mGeneration << "\n";
+          set_traits_next_gen(m_rng_engine);
+          std::cout<<"i: "<< i << "\n";
+        }
+
     }
-    float total_traits_facilitated=0;
 
+   // plant_coordinats new_seed_coordinates;
+
+    //Toevoegen van laatste generatie aan grid
+    /*
+    if(mGeneration>0)
+    new_seed_coordinates=seed_coordinates_per_generation[seed_coordinates_per_generation.size()-1];
+
+    for(unsigned i=(mGeneration-1)*(ui->spinBox_init_n_seeds->value()); i<new_seed_coordinates.size(); i++)
+    {
+
+    }
+    std::cout<<"seed cordinates size: "<<new_seed_coordinates.size()-(mGeneration-1)*(ui->spinBox_init_n_seeds->value()) <<"\n";
+*/
+
+    float total_traits_facilitated=0;
     total_traits_facilitated=facilitated_plant_trait_value.size();
-    set_traits_next_gen(m_rng_engine, total_traits_facilitated);
     clear_fitness_trait_vectors();
     ShowCurrentTraitDistributionGraph();
-    //float total_traits_facilitated=0;
     float total_traits_unfacilitated=0;
     for(unsigned i=0; i<facilitated_plant_trait_value.size(); ++i)
     {
@@ -597,8 +629,11 @@ void MainWindow::set_fitness_unfacilitated()
         unfacilitated_plant_fitness_value.push_back(fitness_unfacilitated);
     }
 }
-void MainWindow::set_traits_next_gen(std::mt19937& mt, const int total_traits_facilitated)
+void MainWindow::set_traits_next_gen(std::mt19937& mt)
 {
+
+        int total_traits_facilitated=0;
+        total_traits_facilitated=facilitated_plant_trait_value.size();
        std::vector<double> fitness_all_plants;
        set_fitness_facilitated();
        set_fitness_unfacilitated();
@@ -614,21 +649,30 @@ void MainWindow::set_traits_next_gen(std::mt19937& mt, const int total_traits_fa
 
        std::discrete_distribution<int> dist(fitness_all_plants.begin(), fitness_all_plants.end());
 
-       std::cout<<"facilitated size: "<< total_traits_facilitated <<"\n";
-       for (int i=0; i!=ui->spinBox_init_n_seeds->value(); ++i)
+
+
+       //std::cout<<"facilitated size: "<< total_traits_facilitated <<"\n";
+       for (int i=0; i!=total_traits_facilitated; ++i)
        {
 
-         std::cout << dist(mt) << ' ';
+        //std::cout<<plants_that_reproduce_facilitated[i]<< " ";
+         //std::cout << dist(mt) << ' ';
          if(dist(mt) < total_traits_facilitated)
          {
+
+             plants_that_reproduce_facilitated.push_back(dist(mt));
              nFacilitated_plants_produced+=1;
          }
          else
          {
+             plants_that_reproduce_unfacilitated.push_back(dist(mt));
              nUnfacilitated_plants_produced+=1;
          }
        }
-      std::cout<<"\n";
+       std::cout<<"nFacilitated_plants_produced: " <<nFacilitated_plants_produced << "\n";
+        std::cout<<"unfacilitated_plants_produced: " <<nUnfacilitated_plants_produced << "\n";
+      //std::cout<<"\n";
+
 }
 void MainWindow::clear_fitness_trait_vectors()
 {
@@ -670,13 +714,6 @@ void MainWindow::check_seed_nurse_plant_coordinates(
         nurse_plant_y = nurse_plant[i].second;
         nurse_plant_y+=y;
     }
-/*
-    assert(nurse_plant_y>0);
-    assert(nurse_plant_y<g.size());
-
-    assert(nurse_plant_x>0);
-    assert(nurse_plant_x<g[0].size());
-    */
 }
 void MainWindow::new_generation(plant_coordinats seed_coordinate, plant_coordinats &nurse_plant, yx_grid& g, const int generation_cycle)
 {
@@ -740,16 +777,16 @@ void MainWindow::set_plant_trait_next_gen( plant_values &plant_trait_values)
 
 void MainWindow::set_plants(yx_grid& g)
 {
-    plant_coordinats nurse_plant_coordinats;
+    plant_coordinats nurse_plant_coordinates;
     plant_coordinats facilitated_plant_coordinates;
     plant_coordinats unfacilitated_plant_coordinates;
     plant_trait_values.clear();
-    add_nurse_plants(g, nurse_plant_coordinats);
-    assert(static_cast<int>(nurse_plant_coordinats.size()) == ui->spinBox_n_nurse->value());
-    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinats, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
+    add_nurse_plants(g, nurse_plant_coordinates);
+    assert(static_cast<int>(nurse_plant_coordinates.size()) == ui->spinBox_n_nurse->value());
+    set_facilitated_and_unfacilitated_plants(g, nurse_plant_coordinates, facilitated_plant_coordinates, unfacilitated_plant_coordinates, plant_trait_values);
     if(ui->spinBox_generation->value() > 0)
     {
-        GenerateGeneration(g, nurse_plant_coordinats, facilitated_plant_coordinates);
+        GenerateGeneration(g, nurse_plant_coordinates, facilitated_plant_coordinates);
     }
 }
 void MainWindow::CreateGrid()
@@ -762,7 +799,6 @@ void MainWindow::CreateGrid()
     );
     set_plants(grid);
     DrawGrid(grid);
-
     m_seagrass_widget->update();
     this->update();
 }
@@ -1119,13 +1155,13 @@ yx_grid create_vector_grid(
 
 bool is_good_spot_for_nurse_plant(
   const coordinat& c,
-  const plant_coordinats& nurse_plant_coordinats,
+  const plant_coordinats& nurse_plant_coordinates,
   const int min_dx,
   const int min_dy
 )
 {
     // npc: Nurse Plant Coordinat
-    for(const auto& npc: nurse_plant_coordinats)
+    for(const auto& npc: nurse_plant_coordinates)
     {
         const int dx=std::abs(npc.first - c.first);
         const int dy=std::abs(npc.second - c.second);
